@@ -12,40 +12,36 @@ class UmkmSeeder extends Seeder
         DB::table('umkm')->insert([
             [
                 'pengguna_id' => 2,
-                'kategori_umkm_id' => 1,
-                'lokasi_id' => 1,
                 'nama_usaha' => 'Maju Kuliner',
                 'deskripsi' => 'UMKM makanan ringan',
+                'kategori' => 'mikro',
                 'status' => 'aktif',
                 'created_at' => now(),
                 'updated_at' => now()
             ],
             [
                 'pengguna_id' => 4,
-                'kategori_umkm_id' => 2,
-                'lokasi_id' => 2,
                 'nama_usaha' => 'Kreatif Fashion',
                 'deskripsi' => 'UMKM pakaian dan aksesoris',
+                'kategori' => 'kecil',
                 'status' => 'aktif',
                 'created_at' => now(),
                 'updated_at' => now()
             ],
             [
                 'pengguna_id' => 2,
-                'kategori_umkm_id' => 3,
-                'lokasi_id' => 3,
                 'nama_usaha' => 'Kerajinan Tangan',
                 'deskripsi' => 'UMKM kerajinan lokal',
+                'kategori' => 'mikro',
                 'status' => 'aktif',
                 'created_at' => now(),
                 'updated_at' => now()
             ],
             [
                 'pengguna_id' => 4,
-                'kategori_umkm_id' => 4,
-                'lokasi_id' => 4,
                 'nama_usaha' => 'Digital Kreatif',
                 'deskripsi' => 'UMKM pengembangan aplikasi',
+                'kategori' => 'menengah',
                 'status' => 'aktif',
                 'created_at' => now(),
                 'updated_at' => now()

@@ -107,11 +107,11 @@ public function eksplorasi()
     $user = auth()->user();
 
     // Mengambil UMKM yang terhubung dengan Mitra ini dan statusnya 'disetujui'
-    $umkmsJoined = $user->umkms()
-                        ->wherePivot('status_kolaborasi', 'disetujui')
-                        ->orderBy('pendaftaran_event.created_at', 'desc')
-                        ->get();
-
+// Mengambil UMKM yang sudah ACC kolaborasi
+$umkmsJoined = auth()->user()->umkms()
+                    ->wherePivot('status_kolaborasi', 'disetujui')
+                    ->get();
+                    
     return view('mitra.eksplorasi', compact('umkmsJoined'));
 }
 }

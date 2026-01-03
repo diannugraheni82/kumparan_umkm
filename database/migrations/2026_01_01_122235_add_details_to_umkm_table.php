@@ -9,8 +9,10 @@ class Umkm extends Model
 {
     use HasFactory;
 
+    // Nama tabel di database
     protected $table = 'umkm';
 
+    // Kolom yang boleh diisi (Mass Assignment)
     protected $fillable = [
         'pengguna_id', 
         'nama_usaha', 
@@ -35,14 +37,21 @@ class Umkm extends Model
         'portfolio_produk',
     ];
 
+    /**
+     * Casting data otomatis.
+     * Mengubah format JSON dari database menjadi Array di Laravel secara otomatis.
+     */
     protected $casts = [
         'portfolio_produk' => 'array',
+        'modal_usaha' => 'integer',
+        'limit_pinjaman' => 'integer',
+        'saldo_pinjaman' => 'integer',
     ];
 
-    // --- RELASI ---
+    // --- RELASI DATABASE ---
 
     /**
-     * Relasi ke Pengguna (Pemilik UMKM)
+     * Relasi ke User (Pemilik UMKM)
      */
     public function pengguna()
     {
@@ -50,7 +59,8 @@ class Umkm extends Model
     }
 
     /**
-     * Relasi ke Pinjaman/Pembiayaan
+     * Relasi ke Pembiayaan Modal
+     * Menggunakan camelCase (pembiayaanModal) adalah standar Laravel.
      */
     public function pembiayaanModal()
     {
@@ -58,7 +68,7 @@ class Umkm extends Model
     }
 
     /**
-     * Relasi ke Tabel Pivot Pendaftaran Event (Menghubungkan UMKM ke Mitra)
+     * Relasi ke Pendaftaran Event (Tabel Pivot)
      */
     public function pendaftaranEvent()
     {
@@ -66,8 +76,8 @@ class Umkm extends Model
     }
 
     /**
-     * Relasi Langsung ke Mitra (Banyak ke Banyak melalui Pendaftaran Event)
-     * Gunakan ini untuk menampilkan Partner di Dashboard Mitra
+     * Relasi Many-to-Many ke Mitra melalui tabel pivot 'pendaftaran_event'
+     * Ini krusial agar Mitra bisa melihat UMKM yang berkolaborasi dengannya.
      */
     public function mitras()
     {
