@@ -19,13 +19,12 @@ class DatabaseSeeder extends Seeder
             UmkmSeeder::class,
             LegalitasUmkmSeeder::class,
             PembayaranPendaftaranSeeder::class,
-            // PembiayaanModalSeeder::class,  <-- Dimatikan karena error kolom 'status'
-            // CicilanPembiayaanSeeder::class, <-- Dimatikan karena bergantung pada PembiayaanModal
+            // PembiayaanModalSeeder::class,  // Dimatikan sementara jika kolom 'status' belum ada
+            // CicilanPembiayaanSeeder::class, // Dimatikan karena bergantung pada PembiayaanModal
             EventSeeder::class,
             PendaftaranEventSeeder::class,
             NotifikasiSeeder::class,
             BeritaSeeder::class,
         ]);
-        
     }
 }
