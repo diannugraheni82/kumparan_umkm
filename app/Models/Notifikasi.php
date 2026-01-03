@@ -9,9 +9,13 @@ class Notifikasi extends Model
     protected $table = 'notifikasi';
 
     protected $fillable = [
-        'pengguna_id',
+        'pengguna_id', 
+        'pengirim_id', 
         'judul',
         'pesan',
+        'kategori',    
+        'data_id',  
+        'status',    
         'dibaca'
     ];
 

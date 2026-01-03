@@ -10,7 +10,8 @@ class PendaftaranEvent extends Model
 
     protected $fillable = [
         'event_id',
-        'umkm_id'
+        'umkm_id',
+        'status',
     ];
 
     public function event()

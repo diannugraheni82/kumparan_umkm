@@ -7,34 +7,18 @@ use Illuminate\Database\Eloquent\Model;
 class Umkm extends Model
 {
     protected $table = 'umkm';
-    protected $casts = [
-        'portfolio_produk' => 'array',
-    ];
+protected $fillable = [
+    'pengguna_id', 'nama_usaha', 'no_whatsapp', 'npwp', 'alamat_usaha', 
+    'status_tempat', 'luas_lahan', 'kbli', 'jumlah_karyawan', 'modal_usaha', 
+    'kategori', 'omzet_tahunan', 'kapasitas_produksi', 'sistem_penjualan', 
+    'limit_pinjaman', 'saldo_pinjaman', 'nama_bank', 'nomor_rekening', 
+    'deskripsi', 'portfolio_produk', 'status'
+];
 
-    protected $fillable = [
-        'pengguna_id', 
-        'nama_usaha', 
-        'no_whatsapp', 
-        'npwp', 
-        'alamat_usaha', 
-        'status_tempat', 
-        'luas_lahan', 
-        'kbli', 
-        'jumlah_karyawan', 
-        'kategori', 
-        'modal_usaha', 
-        'omzet_tahunan',
-        'limit_pinjaman', 
-        'saldo_pinjaman',
-        'kapasitas_produksi', 
-        'sistem_penjualan', 
-        'deskripsi', 
-        'status',
-        'nama_bank',
-        'nomor_rekening',
-        'portfolio_produk',
-    ];
-
+// Sangat Penting: Cast portfolio_produk agar JSON terbaca sebagai Array
+protected $casts = [
+    'portfolio_produk' => 'array',
+];
     public function pengguna()
     {
         return $this->belongsTo(Pengguna::class, 'pengguna_id');

@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('event', function (Blueprint $table) {
             $table->id();
             $table->foreignId('mitra_id')->constrained('pengguna');
-            $table->foreignId('lokasi_id')->constrained('lokasi');
+            $table->string('lokasi');
             $table->string('nama_event');
             $table->date('tanggal');
             $table->integer('kuota');

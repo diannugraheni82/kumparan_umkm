@@ -6,6 +6,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use App\Models\Umkm;
 
 class User extends Authenticatable
 {
@@ -48,8 +49,24 @@ class User extends Authenticatable
             'password' => 'hashed',
         ];
     }
-    public function umkm()
-    {
-        return $this->hasOne(Umkm::class, 'pengguna_id'); 
-    }
+    // app/Models/User.php
+
+// app/Models/User.php
+
+public function umkms()
+{
+    // 'pendaftaran_event' adalah nama tabel pivot Anda
+    // 'status_kolaborasi' adalah kolom untuk membedakan mana yang sudah ACC
+    return $this->belongsToMany(Umkm::class, 'pendaftaran_event', 'mitra_id', 'umkm_id')
+                ->withPivot('status_kolaborasi', 'created_at')
+                ->withTimestamps();
+}
+
+// app/Models/User.php
+
+public function events()
+{
+    // Mengacu ke tabel 'event' yang Anda buat tadi
+    return $this->hasMany(Event::class, 'mitra_id');
+}
 }

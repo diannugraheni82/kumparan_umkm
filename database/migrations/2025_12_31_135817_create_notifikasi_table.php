@@ -13,9 +13,13 @@ return new class extends Migration
     {
         Schema::create('notifikasi', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('pengguna_id')->constrained('pengguna');
+            $table->foreignId('pengguna_id')->constrained('users')->onDelete('cascade');
+            $table->unsignedBigInteger('pengirim_id')->nullable(); // Siapa yang ngajak
             $table->string('judul');
             $table->text('pesan');
+            $table->string('kategori')->default('info'); // 'kolaborasi' atau 'umum'
+            $table->unsignedBigInteger('data_id')->nullable(); // ID Mitra pencatat
+            $table->enum('status', ['pending', 'disetujui', 'ditolak'])->default('pending');
             $table->boolean('dibaca')->default(false);
             $table->timestamps();
         });        

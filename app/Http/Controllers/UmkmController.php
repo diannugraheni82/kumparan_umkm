@@ -29,87 +29,86 @@ class UmkmController extends Controller
     /**
      * Menyimpan data UMKM baru
      */
-    public function store(Request $request)
-    {
-        $validatedData = $request->validate([
-            'nama_usaha'         => 'required|string|max:255',
-            'no_whatsapp'        => 'nullable|numeric',
-            'npwp'               => 'nullable|string|max:20',
-            'alamat_usaha'       => 'nullable|string',
-            'status_tempat'      => 'nullable|string',
-            'luas_lahan'         => 'nullable|numeric',
-            'kbli'               => 'nullable|string|size:5',
-            'jumlah_karyawan'    => 'nullable|integer',
-            'modal_usaha'        => 'required|numeric',
-            'omzet_tahunan'      => 'nullable|numeric',
-            'kapasitas_produksi' => 'nullable|string',
-            'sistem_penjualan'   => 'nullable|in:luring,daring,keduanya',
-            'deskripsi'          => 'required|string',
-            'nama_bank'          => 'required|string',
-            'nomor_rekening'     => 'required|numeric',
-            'produk_nama.*' => 'required|string',
-            'produk_detail.*' => 'required|string',
-            'produk_foto.*' => 'nullable|image|mimes:jpg,jpeg,png|max:2048', // Validasi foto
-        ]);
+public function store(Request $request)
+{
+    $validatedData = $request->validate([
+        'nama_usaha'         => 'required|string|max:255',
+        'no_whatsapp'        => 'nullable|numeric',
+        'npwp'               => 'nullable|string|max:20',
+        'alamat_usaha'       => 'nullable|string',
+        'status_tempat'      => 'nullable|string',
+        'luas_lahan'         => 'nullable|numeric',
+        'kbli'               => 'nullable|string|size:5',
+        'jumlah_karyawan'    => 'nullable|integer',
+        'modal_usaha'        => 'required|numeric',
+        'omzet_tahunan'      => 'nullable|numeric',
+        'kapasitas_produksi' => 'nullable|string',
+        'sistem_penjualan'   => 'nullable|in:luring,daring,keduanya',
+        'deskripsi'          => 'required|string',
+        'nama_bank'          => 'required|string',
+        'nomor_rekening'     => 'required|numeric',
+        'produk_nama.*'      => 'required|string',
+        'produk_detail.*'    => 'required|string',
+        'produk_foto.*'      => 'nullable|image|mimes:jpg,jpeg,png|max:2048', 
+        // Hapus 'kategori' dari validasi request karena kita akan menentukannya secara otomatis
+    ]);
 
-        $portfolio = [];
-        if ($request->has('produk_nama')) {
-            foreach ($request->produk_nama as $key => $namaProduk) {
-                $path = null;
-                // Cek jika ada file foto yang diupload untuk baris ini
-                if ($request->hasFile("produk_foto.$key")) {
-                    $path = $request->file("produk_foto.$key")->store('produk', 'public');
-                }
-
-                $portfolio[] = [
-                    'nama' => $namaProduk,
-                    'detail' => $request->produk_detail[$key] ?? '',
-                    'foto' => $path
-                ];
+    // 1. Olah Portfolio (Tetap sama)
+    $portfolio = [];
+    if ($request->has('produk_nama')) {
+        foreach ($request->produk_nama as $key => $namaProduk) {
+            $path = null;
+            if ($request->hasFile("produk_foto.$key")) {
+                $path = $request->file("produk_foto.$key")->store('produk', 'public');
             }
+            $portfolio[] = [
+                'nama' => $namaProduk,
+                'detail' => $request->produk_detail[$key] ?? '',
+                'foto' => $path
+            ];
         }
-
-        // 2. Logika Penentuan Kategori & Limit
-        $modal = $request->modal_usaha;
-        if ($modal <= 50000000) {
-            $kategori = 'mikro';
-            $limit    = 2000000;
-        } elseif ($modal <= 500000000) {
-            $kategori = 'kecil';
-            $limit    = 10000000;
-        } else {
-            $kategori = 'menengah';
-            $limit    = 50000000;
-        }
-
-        // 3. Simpan Data
-        Umkm::create([
-            'pengguna_id'        => Auth::id(),
-            'nama_usaha'         => $validatedData['nama_usaha'],
-            'no_whatsapp'        => $validatedData['no_whatsapp'],
-            'npwp'               => $validatedData['npwp'],
-            'alamat_usaha'       => $validatedData['alamat_usaha'],
-            'status_tempat'      => $validatedData['status_tempat'],
-            'luas_lahan'         => $validatedData['luas_lahan'],
-            'kbli'               => $validatedData['kbli'],
-            'jumlah_karyawan'    => $validatedData['jumlah_karyawan'] ?? 0,
-            'modal_usaha'        => $modal,
-            'kategori'           => $kategori,
-            'limit_pinjaman'     => $limit,
-            'saldo_pinjaman'     => 0,
-            'omzet_tahunan'      => $validatedData['omzet_tahunan'] ?? 0,
-            'kapasitas_produksi' => $validatedData['kapasitas_produksi'],
-            'sistem_penjualan'   => $validatedData['sistem_penjualan'] ?? 'luring',
-            'deskripsi'          => $validatedData['deskripsi'],
-            'nama_bank'          => $validatedData['nama_bank'],
-            'nomor_rekening'     => $validatedData['nomor_rekening'],
-            'portfolio_produk'   => $portfolio, 
-            'status'             => 'pending',
-        ]);
-
-        return redirect()->route('umkm.dashboard')->with('success', "Pendaftaran berhasil! Kategori: " . ucfirst($kategori) . ". Limit: Rp " . number_format($limit, 0, ',', '.'));
     }
 
+    // 2. Logika Penentuan Kategori & Limit (PASTIKAN STRING INI SAMA DENGAN DI DATABASE)
+    $modal = $request->modal_usaha;
+    if ($modal <= 50000000) {
+        $kategori = 'mikro'; // Harus huruf kecil jika di DB 'mikro'
+        $limit    = 2000000;
+    } elseif ($modal <= 500000000) {
+        $kategori = 'kecil';
+        $limit    = 10000000;
+    } else {
+        $kategori = 'menengah';
+        $limit    = 50000000;
+    }
+
+    // 3. Simpan Data
+    Umkm::create([
+        'pengguna_id'        => Auth::id(),
+        'nama_usaha'         => $validatedData['nama_usaha'],
+        'no_whatsapp'        => $validatedData['no_whatsapp'],
+        'npwp'               => $validatedData['npwp'],
+        'alamat_usaha'       => $validatedData['alamat_usaha'],
+        'status_tempat'      => $validatedData['status_tempat'],
+        'luas_lahan'         => $validatedData['luas_lahan'],
+        'kbli'               => $validatedData['kbli'],
+        'jumlah_karyawan'    => $validatedData['jumlah_karyawan'] ?? 0,
+        'modal_usaha'        => $modal,
+        'kategori'           => $kategori, // Menggunakan variabel hasil logika, bukan request
+        'limit_pinjaman'     => $limit,
+        'saldo_pinjaman'     => 0,
+        'omzet_tahunan'      => $validatedData['omzet_tahunan'] ?? 0,
+        'kapasitas_produksi' => $validatedData['kapasitas_produksi'],
+        'sistem_penjualan'   => $validatedData['sistem_penjualan'] ?? 'luring',
+        'deskripsi'          => $validatedData['deskripsi'],
+        'nama_bank'          => $validatedData['nama_bank'],
+        'nomor_rekening'     => $validatedData['nomor_rekening'],
+        'portfolio_produk'   => $portfolio, 
+        'status'             => 'pending',
+    ]);
+
+    return redirect()->route('umkm.dashboard')->with('success', "Pendaftaran berhasil!");
+}
     /**
      * Dashboard UMKM
      */

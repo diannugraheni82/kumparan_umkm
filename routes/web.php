@@ -2,64 +2,69 @@
 
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\UmkmController;
+use App\Http\Controllers\MitraController;
+use App\Http\Controllers\EventController;
 use Illuminate\Support\Facades\Route;
 
+// --- PUBLIC ROUTES ---
 Route::get('/', function () {
     return view('welcome');
 });
 
+// --- ROLE REDIRECTOR ---
 Route::get('/dashboard', function () {
     $role = auth()->user()->role;
-
     if ($role === 'admin') {
         return redirect()->route('admin.dashboard');
     } elseif ($role === 'mitra') {
         return redirect()->route('mitra.dashboard');
     }
-
     return redirect()->route('umkm.dashboard');
 })->middleware(['auth'])->name('dashboard');
 
-//Admin
+// --- ADMIN ROUTES ---
 Route::middleware(['auth', 'role:admin'])->group(function () {
     Route::get('/admin/dashboard', function () {
-        return view('admin.dashboard'); // Pastikan Caca buat folder admin/dashboard.blade.php
+        return view('admin.dashboard');
     })->name('admin.dashboard');
 });
 
-// UMKM
-Route::middleware(['auth', 'role:umkm'])->group(function () {
-    // Dashboard Utama UMKM
-    Route::get('/umkm/dashboard', [UmkmController::class, 'index'])->name('umkm.dashboard');
-
-    // Proses Input Data (Profil UMKM)
-    Route::get('/umkm/input-data', [UmkmController::class, 'create'])->name('umkm.input');
-    Route::post('/umkm/input-data', [UmkmController::class, 'store'])->name('umkm.store');
-    
-    // Proses Edit Data
-    Route::get('/umkm/edit-data', [UmkmController::class, 'edit'])->name('umkm.edit');
-    Route::patch('/umkm/edit-data', [UmkmController::class, 'update'])->name('umkm.update');
-    
-    // Fitur Paylater/Pinjaman
-    Route::post('/umkm/ajukan-pinjaman', [UmkmController::class, 'ajukanPinjaman'])->name('umkm.ajukan-pinjaman');
-    Route::get('/umkm/cetak-bukti/{id}', [UmkmController::class, 'cetakBukti'])->name('umkm.cetak-bukti');
-    Route::get('/umkm/bayar/{id_pinjaman}', [UmkmController::class, 'bayar'])->name('umkm.bayar');
-    // Catatan: Route umkm.create dan umkm.store yang duplikat di bawah sudah dihapus 
-    // karena sudah diwakili oleh umkm.input dan umkm.store di atas.
-});
-// Mitra
-Route::middleware(['auth', 'role:mitra'])->group(function () {
-    Route::get('/mitra/dashboard', function () {
-        return view('mitra.dashboard'); // Pastikan Caca buat folder mitra/dashboard.blade.php
-    })->name('mitra.dashboard');
+// --- UMKM ROUTES ---
+Route::middleware(['auth', 'role:umkm'])->prefix('umkm')->name('umkm.')->group(function () {
+    Route::get('/dashboard', [UmkmController::class, 'index'])->name('dashboard');
+    Route::get('/input-data', [UmkmController::class, 'create'])->name('input');
+    Route::post('/input-data', [UmkmController::class, 'store'])->name('store');
+    Route::get('/edit-data', [UmkmController::class, 'edit'])->name('edit');
+    Route::patch('/edit-data', [UmkmController::class, 'update'])->name('update');
+    Route::post('/ajukan-pinjaman', [UmkmController::class, 'ajukanPinjaman'])->name('ajukan-pinjaman');
+    Route::get('/cetak-bukti/{id}', [UmkmController::class, 'cetakBukti'])->name('cetak-bukti');
+    Route::get('/bayar/{id_pinjaman}', [UmkmController::class, 'bayar'])->name('bayar');
 });
 
+// --- MITRA ROUTES (INI YANG KITA PERBAIKI) ---
+Route::middleware(['auth', 'role:mitra'])->prefix('mitra')->name('mitra.')->group(function () {
+    // Dashboard Utama Mitra
+    Route::get('/dashboard', [MitraController::class, 'dashboard'])->name('dashboard');
+    
+    // Eksplorasi UMKM
+    Route::get('/eksplorasi', [MitraController::class, 'eksplorasi'])->name('eksplorasi');
+    
+    // Detail UMKM (dari sisi Mitra)
+    Route::get('/umkm/{id}', [MitraController::class, 'show'])->name('umkm.show');
+
+    // Manajemen Event (Menggunakan EventController)
+    Route::prefix('events')->name('events.')->group(function () {
+        Route::get('/', [EventController::class, 'index'])->name('index');
+        Route::get('/create', [EventController::class, 'create'])->name('create');
+        Route::post('/store', [EventController::class, 'store'])->name('store');
+    });
+});
+
+// --- PROFILE ROUTES ---
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });
-
-
 
 require __DIR__.'/auth.php';
