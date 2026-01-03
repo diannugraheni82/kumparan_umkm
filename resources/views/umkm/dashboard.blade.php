@@ -236,7 +236,10 @@ document.addEventListener('DOMContentLoaded', function () {
             data: {
                 labels: ['Terpakai','Sisa'],
                 datasets: [{
-                    data: [{{ $umkm->saldo_pinjaman }}, {{ $umkm->limit_pinjaman - $umkm->saldo_pinjaman }}],
+                    data: [
+                        {{ $umkm->saldo_pinjaman ?? 0 }}, 
+                        {{ ($umkm->limit_pinjaman ?? 0) - ($umkm->saldo_pinjaman ?? 0) }}
+                    ],
                     backgroundColor: ['#0d6efd','#cfe2ff']
                 }]
             },
