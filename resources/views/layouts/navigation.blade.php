@@ -1,4 +1,4 @@
-<nav class="navbar navbar-expand-lg navbar-light bg-white border-bottom sticky-top">
+<!-- <nav class="navbar navbar-expand-lg navbar-light bg-white border-bottom sticky-top">
     <div class="container">
         <a class="navbar-brand" href="{{ route('dashboard') }}">
             <img src="https://laravel.com/img/logomark.min.svg" alt="Logo" width="30" height="24">
@@ -40,4 +40,4 @@
             </ul>
         </div>
     </div>
-</nav>
+</nav> -->

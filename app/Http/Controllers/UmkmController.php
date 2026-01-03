@@ -114,32 +114,48 @@ class UmkmController extends Controller
      * Dashboard UMKM
      */
     public function index()
-    {
-        $user = Auth::user();
-        $umkm = Umkm::where('pengguna_id', $user->id)->first();
-        
-        $labels = collect();
-        $values = collect();
-        $pinjamanModal = collect();
+{
+    $user = Auth::user();
+    $umkm = Umkm::where('pengguna_id', $user->id)->first();
 
-        if ($umkm) {
-            $riwayatGrafik = PembiayaanModal::where('umkm_id', $umkm->id)
-                                ->orderBy('created_at', 'asc')
-                                ->take(6)
-                                ->get();
+    // Default kosong
+    $labels = collect();
+    $values = collect();
+    $pinjamanModal = collect();
+    $beritaHot = collect();
 
-            $labels = $riwayatGrafik->map(fn($q) => $q->created_at ? $q->created_at->format('d M') : 'N/A');
-            $values = $riwayatGrafik->pluck('jumlah_pinjaman');
-            $pinjamanModal = $umkm->PembiayaanModal; // Pastikan relasi di model Umkm sudah ada
-        }
+    // Jika SUDAH punya UMKM → ambil data
+    if ($umkm) {
+
+        $riwayatGrafik = PembiayaanModal::where('umkm_id', $umkm->id)
+            ->orderBy('created_at', 'asc')
+            ->take(6)
+            ->get();
+
+        $labels = $riwayatGrafik->map(fn ($q) =>
+            optional($q->created_at)->format('d M')
+        );
+
+        $values = $riwayatGrafik->pluck('jumlah_pinjaman');
+
+        $pinjamanModal = $umkm->pembiayaanModal;
 
         $beritaHot = Berita::where('status_publish', 1)
-                        ->orderBy('tanggal_publish', 'desc')
-                        ->take(3)
-                        ->get();
-
-        return view('umkm.dashboard', compact('umkm', 'beritaHot', 'pinjamanModal', 'labels', 'values'));
+            ->orderBy('tanggal_publish', 'desc')
+            ->take(3)
+            ->get();
     }
+
+    // 🔥 SELALU KEMBALI KE SATU VIEW
+    return view('umkm.dashboard', compact(
+        'umkm',
+        'beritaHot',
+        'pinjamanModal',
+        'labels',
+        'values'
+    ));
+}
+
 
     /**
      * Pengajuan Pinjaman Baru
