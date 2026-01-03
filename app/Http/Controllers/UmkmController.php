@@ -15,153 +15,162 @@ use Midtrans\Snap;
 class UmkmController extends Controller
 {
     /**
-     * Menampilkan form input data UMKM
+     * Menampilkan Form Pendaftaran UMKM
      */
     public function create()
     {
-        // Jika user sudah punya UMKM, langsung arahkan ke dashboard
-        if (Auth::user()->umkm) {
-            return redirect()->route('umkm.dashboard');
-        }
         return view('umkm.input_data');
     }
 
     /**
      * Menyimpan data UMKM baru
      */
-public function store(Request $request)
-{
-    $validatedData = $request->validate([
-        'nama_usaha'         => 'required|string|max:255',
-        'no_whatsapp'        => 'nullable|numeric',
-        'npwp'               => 'nullable|string|max:20',
-        'alamat_usaha'       => 'nullable|string',
-        'status_tempat'      => 'nullable|string',
-        'luas_lahan'         => 'nullable|numeric',
-        'kbli'               => 'nullable|string|size:5',
-        'jumlah_karyawan'    => 'nullable|integer',
-        'modal_usaha'        => 'required|numeric',
-        'omzet_tahunan'      => 'nullable|numeric',
-        'kapasitas_produksi' => 'nullable|string',
-        'sistem_penjualan'   => 'nullable|in:luring,daring,keduanya',
-        'deskripsi'          => 'required|string',
-        'nama_bank'          => 'required|string',
-        'nomor_rekening'     => 'required|numeric',
-        'produk_nama.*'      => 'required|string',
-        'produk_detail.*'    => 'required|string',
-        'produk_foto.*'      => 'nullable|image|mimes:jpg,jpeg,png|max:2048', 
-        // Hapus 'kategori' dari validasi request karena kita akan menentukannya secara otomatis
-    ]);
+    public function store(Request $request)
+    {
+        $validatedData = $request->validate([
+            'nama_usaha'         => 'required|string|max:255',
+            'no_whatsapp'        => 'nullable|numeric',
+            'npwp'               => 'nullable|string|max:20',
+            'alamat_usaha'       => 'nullable|string',
+            'status_tempat'      => 'nullable|string',
+            'luas_lahan'         => 'nullable|numeric',
+            'kbli'               => 'nullable|string|size:5',
+            'jumlah_karyawan'    => 'nullable|integer',
+            'modal_usaha'        => 'required|numeric',
+            'omzet_tahunan'      => 'nullable|numeric',
+            'kapasitas_produksi' => 'nullable|string',
+            'sistem_penjualan'   => 'nullable|in:luring,daring,keduanya',
+            'deskripsi'          => 'required|string',
+            'nama_bank'          => 'required|string',
+            'nomor_rekening'     => 'required|numeric',
+            'produk_nama.*'      => 'required|string',
+            'produk_detail.*'    => 'required|string',
+            'produk_foto.*'      => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
+        ]);
 
-    // 1. Olah Portfolio (Tetap sama)
-    $portfolio = [];
-    if ($request->has('produk_nama')) {
-        foreach ($request->produk_nama as $key => $namaProduk) {
-            $path = null;
-            if ($request->hasFile("produk_foto.$key")) {
-                $path = $request->file("produk_foto.$key")->store('produk', 'public');
+        // Olah Portfolio
+        $portfolio = [];
+        if ($request->has('produk_nama')) {
+            foreach ($request->produk_nama as $key => $namaProduk) {
+                $path = null;
+                if ($request->hasFile("produk_foto.$key")) {
+                    $path = $request->file("produk_foto.$key")->store('produk', 'public');
+                }
+                $portfolio[] = [
+                    'nama' => $namaProduk,
+                    'detail' => $request->produk_detail[$key] ?? '',
+                    'foto' => $path
+                ];
             }
-            $portfolio[] = [
-                'nama' => $namaProduk,
-                'detail' => $request->produk_detail[$key] ?? '',
-                'foto' => $path
-            ];
         }
+
+        // Logika Penentuan Kategori & Limit
+        $modal = $request->modal_usaha;
+        if ($modal <= 50000000) {
+            $kategori = 'mikro';
+            $limit    = 2000000;
+        } elseif ($modal <= 500000000) {
+            $kategori = 'kecil';
+            $limit    = 10000000;
+        } else {
+            $kategori = 'menengah';
+            $limit    = 50000000;
+        }
+
+        Umkm::create([
+            'pengguna_id'        => Auth::id(),
+            'nama_usaha'         => $validatedData['nama_usaha'],
+            'no_whatsapp'        => $validatedData['no_whatsapp'],
+            'npwp'               => $validatedData['npwp'],
+            'alamat_usaha'       => $validatedData['alamat_usaha'],
+            'status_tempat'      => $validatedData['status_tempat'],
+            'luas_lahan'         => $validatedData['luas_lahan'],
+            'kbli'               => $validatedData['kbli'],
+            'jumlah_karyawan'    => $validatedData['jumlah_karyawan'] ?? 0,
+            'modal_usaha'        => $modal,
+            'kategori'           => $kategori,
+            'limit_pinjaman'     => $limit,
+            'saldo_pinjaman'     => 0,
+            'omzet_tahunan'      => $validatedData['omzet_tahunan'] ?? 0,
+            'kapasitas_produksi' => $validatedData['kapasitas_produksi'],
+            'sistem_penjualan'   => $validatedData['sistem_penjualan'] ?? 'luring',
+            'deskripsi'          => $validatedData['deskripsi'],
+            'nama_bank'          => $validatedData['nama_bank'],
+            'nomor_rekening'     => $validatedData['nomor_rekening'],
+            'portfolio_produk'   => $portfolio, 
+            'status'             => 'pending',
+        ]);
+
+        return redirect()->route('umkm.dashboard')->with('success', "Pendaftaran berhasil!");
     }
 
-    // 2. Logika Penentuan Kategori & Limit (PASTIKAN STRING INI SAMA DENGAN DI DATABASE)
-    $modal = $request->modal_usaha;
-    if ($modal <= 50000000) {
-        $kategori = 'mikro'; // Harus huruf kecil jika di DB 'mikro'
-        $limit    = 2000000;
-    } elseif ($modal <= 500000000) {
-        $kategori = 'kecil';
-        $limit    = 10000000;
-    } else {
-        $kategori = 'menengah';
-        $limit    = 50000000;
-    }
-
-    // 3. Simpan Data
-    Umkm::create([
-        'pengguna_id'        => Auth::id(),
-        'nama_usaha'         => $validatedData['nama_usaha'],
-        'no_whatsapp'        => $validatedData['no_whatsapp'],
-        'npwp'               => $validatedData['npwp'],
-        'alamat_usaha'       => $validatedData['alamat_usaha'],
-        'status_tempat'      => $validatedData['status_tempat'],
-        'luas_lahan'         => $validatedData['luas_lahan'],
-        'kbli'               => $validatedData['kbli'],
-        'jumlah_karyawan'    => $validatedData['jumlah_karyawan'] ?? 0,
-        'modal_usaha'        => $modal,
-        'kategori'           => $kategori, // Menggunakan variabel hasil logika, bukan request
-        'limit_pinjaman'     => $limit,
-        'saldo_pinjaman'     => 0,
-        'omzet_tahunan'      => $validatedData['omzet_tahunan'] ?? 0,
-        'kapasitas_produksi' => $validatedData['kapasitas_produksi'],
-        'sistem_penjualan'   => $validatedData['sistem_penjualan'] ?? 'luring',
-        'deskripsi'          => $validatedData['deskripsi'],
-        'nama_bank'          => $validatedData['nama_bank'],
-        'nomor_rekening'     => $validatedData['nomor_rekening'],
-        'portfolio_produk'   => $portfolio, 
-        'status'             => 'pending',
-    ]);
-
-    return redirect()->route('umkm.dashboard')->with('success', "Pendaftaran berhasil!");
-}
     /**
-     * Dashboard UMKM
+     * Dashboard UMKM (Dengan Logika Notifikasi Tetap)
      */
     public function index()
-{
-    $user = Auth::user();
-    $umkm = Umkm::where('pengguna_id', $user->id)->first();
+    {
+        $user = Auth::user();
+        $umkm = Umkm::where('pengguna_id', $user->id)->first();
 
-    // Default kosong
-    $labels = collect();
-    $values = collect();
-    $pinjamanModal = collect();
-    $beritaHot = collect();
+        if (!$umkm) {
+            return view('umkm.dashboard-empty'); 
+        }
 
-    // Jika SUDAH punya UMKM → ambil data
-    if ($umkm) {
-
-        $riwayatGrafik = PembiayaanModal::where('umkm_id', $umkm->id)
-            ->orderBy('created_at', 'asc')
-            ->take(6)
+        // Ambil riwayat pinjaman dari database
+        $riwayatPinjaman = PembiayaanModal::where('umkm_id', $umkm->id)
+            ->orderBy('tanggal_pinjam', 'desc')
             ->get();
 
-        $labels = $riwayatGrafik->map(fn ($q) =>
-            optional($q->created_at)->format('d M')
-        );
+        // LOGIKA NOTIFIKASI LONCENG
+        $listNotifikasi = [];
 
-        $values = $riwayatGrafik->pluck('jumlah_pinjaman');
+        // 1. Cek Status Verifikasi Akun
+        if ($umkm->status == 'aktif') {
+            $listNotifikasi[] = [
+                'judul' => 'Akun Terverifikasi',
+                'pesan' => 'Selamat! Usaha ' . $umkm->nama_usaha . ' telah aktif.',
+                'icon'  => 'bi-patch-check-fill',
+                'warna' => 'text-success'
+            ];
+        }
 
-        $pinjamanModal = $umkm->pembiayaanModal;
+        // 2. Cek Status Pembayaran (Lunas)
+        foreach ($riwayatPinjaman as $p) {
+            if ($p->status_pelunasan == 'lunas') {
+                $listNotifikasi[] = [
+                    'judul' => 'Tagihan Lunas',
+                    'pesan' => 'Pembayaran Rp' . number_format($p->jumlah_pinjaman) . ' berhasil.',
+                    'icon'  => 'bi-cash-coin',
+                    'warna' => 'text-primary'
+                ];
+            }
+        }
 
-        $beritaHot = Berita::where('status_publish', 1)
-            ->orderBy('tanggal_publish', 'desc')
-            ->take(3)
-            ->get();
+        // Persiapan Data Chart
+        $labels = $riwayatPinjaman->map(function($item) {
+            return $item->tanggal_pinjam ? \Carbon\Carbon::parse($item->tanggal_pinjam)->format('d M') : '';
+        })->filter()->toArray();
+        $values = $riwayatPinjaman->pluck('jumlah_pinjaman')->toArray();
+
+        $sisaLimit = $umkm->limit_pinjaman - $umkm->saldo_pinjaman;
+        $maxPinjaman = max(0, $sisaLimit);
+
+        return view('umkm.dashboard', compact(
+            'umkm', 
+            'riwayatPinjaman', 
+            'labels', 
+            'values', 
+            'maxPinjaman', 
+            'listNotifikasi'
+        ));
     }
 
-    // 🔥 SELALU KEMBALI KE SATU VIEW
-    return view('umkm.dashboard', compact(
-        'umkm',
-        'beritaHot',
-        'pinjamanModal',
-        'labels',
-        'values'
-    ));
-}
-
-
     /**
-     * Pengajuan Pinjaman Baru
+     * Proses Pengajuan Pinjaman
      */
     public function ajukanPinjaman(Request $request)
     {
-        $umkm = Auth::user()->umkm;
+        $umkm = Umkm::where('pengguna_id', Auth::id())->firstOrFail();
         $maxPinjaman = $umkm->limit_pinjaman - $umkm->saldo_pinjaman;
 
         $request->validate([
@@ -188,13 +197,13 @@ public function store(Request $request)
      */
     public function bayar($id_pinjaman)
     {
-        $umkm = Auth::user()->umkm;
+        $umkm = Umkm::where('pengguna_id', Auth::id())->firstOrFail();
         $pinjaman = PembiayaanModal::where('id', $id_pinjaman)
                         ->where('umkm_id', $umkm->id)
                         ->firstOrFail();
 
         if ($pinjaman->status_pelunasan === 'lunas') {
-            return response()->json(['error' => 'Tagihan ini sudah lunas.'], 400);
+            return back()->with('error', 'Tagihan ini sudah lunas.');
         }
         
         Config::$serverKey = config('services.midtrans.server_key');
@@ -215,46 +224,57 @@ public function store(Request $request)
 
         try {
             $snapToken = Snap::getSnapToken($params);
-            return response()->json(['snap_token' => $snapToken]);
+            return view('umkm.pembayaran', compact('snapToken', 'pinjaman'));
         } catch (\Exception $e) {
-            return response()->json(['error' => $e->getMessage()], 500);
+            return back()->with('error', $e->getMessage());
         }
     }
 
     /**
-     * Midtrans Callback
+     * Handle Konfirmasi Pembayaran Sukses (Manual/Redirect)
      */
-    public function callback(Request $request)
+    public function pembayaranSukses($id)
     {
-        $serverKey = config('services.midtrans.server_key');
-        $hashed = hash("sha512", $request->order_id . $request->status_code . $request->gross_amount . $serverKey);
-
-        if ($hashed == $request->signature_key) {
-            if (in_array($request->transaction_status, ['capture', 'settlement'])) {
-                $id_pinjaman = explode('-', $request->order_id)[1];
-                $pinjaman = PembiayaanModal::find($id_pinjaman);
-                
-                if ($pinjaman && $pinjaman->status_pelunasan !== 'lunas') {
-                    DB::transaction(function () use ($pinjaman) {
-                        $pinjaman->update(['status_pelunasan' => 'lunas']);
-                        $pinjaman->umkm->decrement('saldo_pinjaman', $pinjaman->jumlah_pinjaman);
-                    });
-                }
-            }
+        $pinjaman = PembiayaanModal::findOrFail($id);
+        
+        if ($pinjaman->status_pelunasan !== 'lunas') {
+            DB::transaction(function () use ($pinjaman) {
+                $pinjaman->update([
+                    'status_pelunasan' => 'lunas',
+                    'tanggal_lunas' => now()
+                ]);
+                $pinjaman->umkm->decrement('saldo_pinjaman', $pinjaman->jumlah_pinjaman);
+            });
         }
-        return response()->json(['status' => 'success']);
+
+        return redirect()->route('umkm.dashboard')->with('success', 'Pembayaran berhasil dikonfirmasi!');
     }
 
     /**
-     * Cetak PDF Bukti
+     * Cetak PDF Bukti Pembayaran
      */
     public function cetakBukti($id)
     {
         $pinjam = PembiayaanModal::with('umkm')->findOrFail($id);
-        if ($pinjam->umkm_id !== Auth::user()->umkm->id) {
+        $umkm = Umkm::where('pengguna_id', Auth::id())->first();
+
+        if ($pinjam->umkm_id !== $umkm->id) {
             abort(403);
         }
+
         $pdf = Pdf::loadView('umkm.cetak_bukti', compact('pinjam'));
-        return $pdf->download('Bukti_Transfer_'.$pinjam->id.'.pdf');
+        return $pdf->download('Struk-Pembayaran-'.$pinjam->id.'.pdf');
     }
+
+    public function accKerjasama($id) {
+    $notif = \App\Models\Notifikasi::findOrFail($id);
+    $notif->update(['status' => 'disetujui', 'dibaca' => true]); //
+    return back()->with('success', 'Kerjasama diterima!');
+}
+
+public function tolakKerjasama($id) {
+    $notif = \App\Models\Notifikasi::findOrFail($id);
+    $notif->update(['status' => 'ditolak', 'dibaca' => true]); //
+    return back()->with('info', 'Kerjasama ditolak.');
+}
 }

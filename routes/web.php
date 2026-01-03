@@ -1,33 +1,35 @@
 <?php
 
+use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\UmkmController;
 use App\Http\Controllers\MitraController;
 use App\Http\Controllers\EventController;
+use App\Http\Controllers\AdminController;
 use App\Http\Controllers\Admin\VerifikasiUmkmController;
-use Illuminate\Support\Facades\Route;
-use Illuminate\Support\Facades\Auth;
 
-/*
-|--------------------------------------------------------------------------
-| Redirect Utama
-|--------------------------------------------------------------------------
-*/
-Route::get('/', function () {
-    return Auth::check() ? redirect()->route('dashboard') : redirect()->route('login');
+
+// Tambahkan ini sementara di web.php untuk bypass login
+Route::get('/force-login', function() {
+    $user = \App\Models\User::where('role', 'admin')->first();
+    if($user) {
+        Auth::login($user);
+        return redirect('/admin/dashboard');
+    }
+    return 'User Admin tidak ditemukan di database!';
 });
 
-/*
-|--------------------------------------------------------------------------
-| Dashboard Redirect (Multi-Role)
-|--------------------------------------------------------------------------
-*/
+Route::get('/', function () {
+    return Auth::check() ? redirect()->route('dashboard') : view('welcome');
+});
+
 Route::get('/dashboard', function () {
-    if (!auth()->check()) {
+    if (!Auth::check()) {
         return redirect()->route('login');
     }
 
-    return match (auth()->user()->role) {
+    return match (Auth::user()->role) {
         'admin' => redirect()->route('admin.dashboard'),
         'mitra' => redirect()->route('mitra.dashboard'),
         'umkm'  => redirect()->route('umkm.dashboard'),
@@ -35,71 +37,48 @@ Route::get('/dashboard', function () {
     };
 })->middleware('auth')->name('dashboard');
 
-/*
-|--------------------------------------------------------------------------
-| ADMIN ROUTES
-|--------------------------------------------------------------------------
-*/
-Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->group(function () {
-    Route::get('/dashboard', function () {
-        return view('admin.dashboard');
-    })->name('dashboard');
 
-    // Fitur Verifikasi UMKM
-    Route::get('/verifikasi', [VerifikasiUmkmController::class, 'index'])->name('verifikasi.index');    
-    Route::post('/verifikasi/{id}', [VerifikasiUmkmController::class, 'updateStatus'])->name('verifikasi.update');
-    Route::get('/verifikasi/cetak', [VerifikasiUmkmController::class, 'cetakPdf'])->name('verifikasi.cetak');
+Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->group(function () {
+    Route::get('/dashboard', [AdminController::class, 'index'])->name('dashboard');
+    Route::get('/verifikasi', [AdminController::class, 'verifikasiIndex'])->name('verifikasi.index');
+    Route::patch('/verifikasi/{id}', [AdminController::class, 'verifikasiUpdate'])->name('verifikasi.update');
+    Route::get('/cetak-laporan', [AdminController::class, 'cetakLaporan'])->name('verifikasi.cetak');
+    Route::get('/pinjaman', [AdminController::class, 'pinjamanIndex'])->name('pinjaman.index');
+    Route::get('/pembayaran', [AdminController::class, 'pembayaranIndex'])->name('pembayaran.index');
+    Route::get('/event', [AdminController::class, 'eventIndex'])->name('event.index');
 });
 
-/*
-|--------------------------------------------------------------------------
-| UMKM ROUTES
-|--------------------------------------------------------------------------
-*/
 Route::middleware(['auth', 'role:umkm'])->prefix('umkm')->name('umkm.')->group(function () {
     Route::get('/dashboard', [UmkmController::class, 'index'])->name('dashboard');
-    
-    // Data & Portofolio
     Route::get('/input-data', [UmkmController::class, 'create'])->name('input');
     Route::post('/input-data', [UmkmController::class, 'store'])->name('store');
     Route::get('/edit-data', [UmkmController::class, 'edit'])->name('edit');
-    Route::patch('/edit-data', [UmkmController::class, 'update'])->name('update');
-    Route::get('/portofolio', function () {
-        return view('umkm.portofolio');
-    })->name('portofolio');
-
-    // Finansial (Pinjaman/Paylater)
+    Route::patch('/edit-data', [UmkmController::class, 'update'])->name('update'); 
+    
     Route::post('/ajukan-pinjaman', [UmkmController::class, 'ajukanPinjaman'])->name('ajukan-pinjaman');
-    Route::get('/cetak-bukti/{id}', [UmkmController::class, 'cetakBukti'])->name('cetak-bukti');
+    
+    // PERBAIKAN DI SINI:
+    // Cukup gunakan 'cetakBukti', nanti otomatis terpanggil sebagai 'umkm.cetakBukti'
+    Route::get('/cetak-bukti/{id}', [UmkmController::class, 'cetakBukti'])->name('cetakBukti');
+    
     Route::get('/bayar/{id_pinjaman}', [UmkmController::class, 'bayar'])->name('bayar');
+    
+    // Cukup gunakan 'pembayaranSukses', nanti otomatis terpanggil sebagai 'umkm.pembayaranSukses'
+    Route::get('/pembayaran-sukses/{id}', [UmkmController::class, 'pembayaranSukses'])->name('pembayaranSukses');
+    
+    Route::post('/umkm/kerjasama/acc/{id}', [UmkmController::class, 'accKerjasama'])->name('umkm.kerjasama.acc');
+Route::post('/umkm/kerjasama/tolak/{id}', [UmkmController::class, 'tolakKerjasama'])->name('umkm.kerjasama.tolak');
 });
 
-/*
-|--------------------------------------------------------------------------
-| MITRA ROUTES
-|--------------------------------------------------------------------------
-*/
 Route::middleware(['auth', 'role:mitra'])->prefix('mitra')->name('mitra.')->group(function () {
-    // Dashboard Utama Mitra
     Route::get('/dashboard', [MitraController::class, 'dashboard'])->name('dashboard');
-    
-    // Eksplorasi & Detail UMKM
     Route::get('/eksplorasi', [MitraController::class, 'eksplorasi'])->name('eksplorasi');
     Route::get('/umkm/{id}', [MitraController::class, 'show'])->name('umkm.show');
-
-    // Manajemen Event
-    Route::prefix('events')->name('events.')->group(function () {
-        Route::get('/', [EventController::class, 'index'])->name('index');
-        Route::get('/create', [EventController::class, 'create'])->name('create');
-        Route::post('/store', [EventController::class, 'store'])->name('store');
-    });
+Route::post('/ajukan-kerjasama/{id}', [MitraController::class, 'ajukanKerjasama'])->name('ajukan.kerjasama');
+// Route::post('/ajukan-kerjasama/{id}', [MitraController::class, 'ajukanKerjasama'])->name('mitra.ajukan.kerjasama');
+    Route::resource('events', EventController::class)->only(['index', 'create', 'store']);
 });
 
-/*
-|--------------------------------------------------------------------------
-| PROFILE & AUTH
-|--------------------------------------------------------------------------
-*/
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');

@@ -3,42 +3,50 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use App\Models\Event; // Import model agar kode lebih bersih
+use Illuminate\Support\Facades\Auth;
 
 class EventController extends Controller
 {
     public function index()
     {
-       $user = auth()->user();
-    $events = \App\Models\Event::where('mitra_id', $user->id)
-                ->withCount('umkms') 
-                ->get();
+        $user = Auth::user();
+        $events = Event::where('mitra_id', $user->id)
+                    ->withCount('umkms') 
+                    ->latest() // Menampilkan event terbaru di atas
+                    ->get();
 
-    // Pastikan ini merujuk ke folder 'events', bukan 'create'
-    return view('mitra.events.index', compact('events'));
-}
+        return view('mitra.events.index', compact('events'));
+    }
 
     public function create()
     {
-        return view('mitra.events.create'); // Buat file create.blade.php nanti
+        return view('mitra.events.create');
     }
 
     public function store(Request $request)
-{
-    $request->validate([
-        'nama_event' => 'required|string|max:255',
-        'tanggal' => 'required|date',
-        'kuota' => 'required|integer|min:1',
-        'lokasi' => 'required|string|max:255', // Validasi sebagai teks
-    ]);
+    {
+        // 1. Validasi input
+        $validated = $request->validate([
+            'nama_event' => 'required|string|max:255',
+            'tanggal'    => 'required|date|after_or_equal:today', // Minimal tanggal hari ini
+            'kuota'      => 'required|integer|min:1',
+            'lokasi'     => 'required|string|max:255', 
+        ]);
 
-    \App\Models\Event::create([
-        'mitra_id' => auth()->id(),
-        'nama_event' => $request->nama_event,
-        'tanggal' => $request->tanggal,
-        'kuota' => $request->kuota,
-        'lokasi' => $request->lokasi, // Simpan teks langsung
-    ]);
+        // 2. Simpan ke Database
+        Event::create([
+            'mitra_id'   => Auth::id(),
+            'nama_event' => $validated['nama_event'],
+            'tanggal'    => $validated['tanggal'],
+            'kuota'      => $validated['kuota'],
+            // Karena nama kolom di database Anda 'lokasi_id' tapi berisi string,
+            // kita masukkan data dari input 'lokasi'
+            'lokasi_id'  => $validated['lokasi'], 
+        ]);
 
-    return redirect()->route('mitra.dashboard')->with('success', 'Event berhasil dipublikasikan!');
-}
+        // 3. Redirect dengan pesan sukses
+        return redirect()->route('mitra.events.index') // Sebaiknya kembali ke list event
+                        ->with('success', 'Event berhasil dipublikasikan!');
+    }
 }

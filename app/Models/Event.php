@@ -14,11 +14,11 @@ class Event extends Model
 
     // Daftarkan kolom yang boleh diisi melalui form
     protected $fillable = [
-        'mitra_id',
-        'nama_event',
-        'lokasi', // TAMBAHKAN INI
-        'tanggal',
-        'kuota',
+    'nama_event',
+    'tanggal',
+    'kuota',
+    'lokasi', // Pastikan ini ada
+    'mitra_id',
     ];
 
     // Relasi ke User/Mitra
@@ -31,4 +31,9 @@ class Event extends Model
 {
     // Sesuaikan dengan nama tabel pivot Anda (pendaftaran_event)
     return $this->belongsToMany(Umkm::class, 'pendaftaran_event', 'event_id', 'umkm_id');
+}
+
+public function user()
+{
+    return $this->belongsTo(User::class, 'user_id');
 }}

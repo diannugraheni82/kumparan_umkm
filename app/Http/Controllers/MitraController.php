@@ -32,9 +32,9 @@ class MitraController extends Controller
         ]);
 
         Event::create([
-            'mitra_id' => Auth::id(), // Sesuai kolom di image_c57967.png
-            'lokasi_id' => $request->lokasi_id,
+            'mitra_id' => auth()->user()->id,
             'nama_event' => $request->nama_event,
+            'lokasi_id' => $request->lokasi_id, // Tambahkan baris ini
             'tanggal' => $request->tanggal,
             'kuota' => $request->kuota,
         ]);
@@ -51,22 +51,29 @@ class MitraController extends Controller
     return view('mitra.show', compact('umkm'));
 }
 
-public function ajukanKolaborasi(Request $request, Umkm $umkm)
+public function ajukanKerjasama($id)
 {
-    // 1. Ambil User ID pemilik UMKM (Pelaku UMKM)
-    $pelakuUmkm = $umkm->user; 
+    $umkm = \App\Models\Umkm::findOrFail($id);
+    $mitra = auth()->user();
 
-    // 2. Simpan notifikasi ke tabel 'notifications'
-    // Jika menggunakan sistem Notifikasi Laravel (Database Notification)
-    $pelakuUmkm->notify(new \App\Notifications\UndanganKolaborasi(auth()->user(), $umkm));
+    // Simpan Notifikasi ke Database
+    \App\Models\Notifikasi::create([
+        'pengguna_id' => $umkm->pengguna_id, // Penerima (Pelaku UMKM)
+        'pengirim_id' => $mitra->id,         // Pengirim (Mitra)
+        'judul'       => 'Ajakan Kerjasama Baru',
+        'pesan'       => "Mitra {$mitra->name} ingin bekerjasama dengan {$umkm->nama_usaha}.",
+        'kategori'    => 'kolaborasi',       // Kategori khusus kerjasama
+        'status'      => 'pending',          // Status awal
+        'dibaca'      => false
+    ]);
 
-    // 3. Siapkan Link WhatsApp
-    $pesanWa = urlencode("Halo " . $umkm->nama_usaha . ", saya " . auth()->user()->name . " dari perusahaan Mitra tertarik untuk berkolaborasi.");
-    $waUrl = "https://wa.me/" . $umkm->no_whatsapp . "?text=" . $pesanWa;
-
-    return redirect($waUrl);
+    return response()->json([
+        'success'    => true,
+        'no_wa'      => $umkm->no_whatsapp, 
+        'nama_umkm'  => $umkm->nama_usaha,
+        'nama_mitra' => $mitra->name
+    ]);
 }
-
 public function kirimKolaborasi(Request $request, $umkm_id)
 {
     $umkm = Umkm::findOrFail($umkm_id);
@@ -91,15 +98,40 @@ public function kirimKolaborasi(Request $request, $umkm_id)
     return redirect($urlWa);
 }
 
-public function dashboard()
+// MitraController.php
+
+public function dashboard(Request $request)
 {
-    // 1. Dashboard menampilkan UMKM yang sudah diverifikasi admin
-    // (Bukan berdasarkan relasi kerjasama, tapi status akun UMKM itu sendiri)
-    $umkms = \App\Models\Umkm::where('status', 'verified')->get();
+    $userId = auth()->id();
+    $search = $request->query('search');
 
-    return view('mitra.dashboard', compact('umkms'));
+    // 1. Mengambil data UMKM yang sudah diverifikasi (Status: aktif)
+    $umkms = \App\Models\Umkm::where('status', 'aktif')
+        ->when($search, function($query) use ($search) {
+            $query->where(function($q) use ($search) {
+                // Mencari berdasarkan nama usaha atau kategori
+                $q->where('nama_usaha', 'like', "%{$search}%")
+                  ->orWhere('kategori', 'like', "%{$search}%");
+            });
+        })
+        ->latest()
+        ->get();
+
+    // 2. Mengambil data Notifikasi asli dari database untuk Mitra
+    // Kita ambil 5 notifikasi terbaru
+    $notifikasi = \App\Models\Notifikasi::where('pengguna_id', $userId)
+                    ->latest()
+                    ->take(5)
+                    ->get();
+
+    // 3. Menghitung jumlah notifikasi yang belum dibaca (untuk badge merah di lonceng)
+    $unreadCount = \App\Models\Notifikasi::where('pengguna_id', $userId)
+                    ->where('dibaca', false)
+                    ->count();
+
+    // 4. Mengirim semua variabel ke view mitra.dashboard
+    return view('mitra.dashboard', compact('umkms', 'notifikasi', 'unreadCount'));
 }
-
 // app/Http/Controllers/MitraController.php
 
 public function eksplorasi()
@@ -111,7 +143,7 @@ public function eksplorasi()
 $umkmsJoined = auth()->user()->umkms()
                     ->wherePivot('status_kolaborasi', 'disetujui')
                     ->get();
-                    
+
     return view('mitra.eksplorasi', compact('umkmsJoined'));
 }
 }

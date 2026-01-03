@@ -37,4 +37,6 @@ class VerifikasiUmkmController extends Controller
         
         return $pdf->download('laporan-umkm-aktif.pdf');
     }
+
+    
 }

@@ -10,6 +10,9 @@ class PembiayaanModal extends Model
     use HasFactory;
     public $timestamps = true;
     protected $table = 'pembiayaan_modal';
+    protected $casts = [
+        'tanggal_pinjam' => 'datetime',
+    ];
 
     protected $fillable = [
         'umkm_id',

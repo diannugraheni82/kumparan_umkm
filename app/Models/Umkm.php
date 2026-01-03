@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use App\Models\User;
 
 class Umkm extends Model
 {
@@ -71,8 +72,15 @@ class Umkm extends Model
      */
     public function mitras()
     {
-        return $this->belongsToMany(User::class, 'pendaftaran_event', 'umkm_id', 'mitra_id')
+        return $this->belongsToMany(User::class, 'pendaftaran_event', 'pengguna_id', 'mitra_id')
                     ->withPivot('status_kolaborasi')
                     ->withTimestamps();
     }
+
+public function user()
+{
+    // Pastikan foreign_key-nya benar (misal: user_id atau id_user)
+    return $this->belongsTo(User::class, 'pengguna_id'); 
+}
+    
 }

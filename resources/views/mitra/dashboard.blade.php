@@ -142,29 +142,28 @@
 
                     <li class="nav-item dropdown me-3">
                         <a class="nav-link dropdown-toggle hide-arrow position-relative p-0" href="#" id="notifDropdown" data-bs-toggle="dropdown">
-                            <i class="bi bi-bell fs-5"></i>
-                            @php $unreadCount = \App\Models\Notifikasi::where('pengguna_id', auth()->id())->where('dibaca', false)->count(); @endphp
-                            @if($unreadCount > 0)
-                                <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" style="font-size: 0.6rem;">
-                                    {{ $unreadCount }}
-                                </span>
-                            @endif
-                        </a>
-                        <ul class="dropdown-menu dropdown-menu-end p-0 overflow-hidden" style="width: 300px;">
-                            <li class="bg-light px-3 py-2 fw-bold border-bottom small">Notifikasi</li>
-                            <div style="max-height: 300px; overflow-y: auto;">
-                                @forelse(\App\Models\Notifikasi::where('pengguna_id', auth()->id())->latest()->take(5)->get() as $notif)
-                                    <li>
-                                        <a class="dropdown-item py-2 border-bottom small" href="#">
-                                            <div class="fw-bold">{{ $notif->judul }}</div>
-                                            <div class="text-muted text-wrap">{{ Str::limit($notif->pesan, 45) }}</div>
-                                        </a>
-                                    </li>
-                                @empty
-                                    <li class="text-center py-4 text-muted small">Tidak ada notifikasi</li>
-                                @endforelse
-                            </div>
-                        </ul>
+    <i class="bi bi-bell fs-5"></i>
+    @if($unreadCount > 0)
+        <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" style="font-size: 0.6rem;">
+            {{ $unreadCount }}
+        </span>
+    @endif
+</a>
+<ul class="dropdown-menu dropdown-menu-end p-0 overflow-hidden" style="width: 300px;">
+    <li class="bg-light px-3 py-2 fw-bold border-bottom small">Notifikasi</li>
+    <div style="max-height: 300px; overflow-y: auto;">
+        @forelse($notifikasi as $notif)
+            <li>
+                <a class="dropdown-item py-2 border-bottom small {{ !$notif->dibaca ? 'bg-light' : '' }}" href="#">
+                    <div class="fw-bold">{{ $notif->judul }}</div>
+                    <div class="text-muted text-wrap">{{ Str::limit($notif->pesan, 45) }}</div>
+                </a>
+            </li>
+        @empty
+            <li class="text-center py-4 text-muted small">Tidak ada notifikasi</li>
+        @endforelse
+    </div>
+</ul>
                     </li>
 
                     <li class="nav-item dropdown">
@@ -221,11 +220,11 @@
                                         <i class="bi bi-patch-check-fill me-1"></i>TERVERIFIKASI
                                     </span>
                                 </div>
-
-                                <h5 class="fw-bold mb-1">{{ $umkm->nama_umkm }}</h5>
-                                <p class="text-muted small mb-3">
-                                    <i class="bi bi-geo-alt me-1"></i>{{ $umkm->alamat ?? 'Lokasi tidak tersedia' }}
-                                </p>
+{{-- Menggunakan nama_usaha dan alamat_usaha sesuai database --}}
+<h5 class="fw-bold mb-1">{{ $umkm->nama_usaha }}</h5>
+<p class="text-muted small mb-3">
+    <i class="bi bi-geo-alt me-1"></i>{{ $umkm->alamat_usaha ?? 'Lokasi tidak tersedia' }}
+</p>
 
                                 <div class="mb-4">
                                     <div class="d-flex justify-content-between small mb-1">
@@ -241,9 +240,6 @@
                                     <a href="{{ route('mitra.umkm.show', $umkm->id) }}" class="btn btn-mitra">
                                         Lihat Profil
                                     </a>
-                                    <button class="btn btn-outline-primary border-0 fw-bold small">
-                                        <i class="bi bi-chat-dots me-2"></i>Hubungi UMKM
-                                    </button>
                                 </div>
                             </div>
                         </div>

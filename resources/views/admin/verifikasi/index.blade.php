@@ -14,9 +14,6 @@
                 
                 <div class="mb-6 flex justify-between items-center">
                     <p class="text-gray-600">Kelola pendaftaran UMKM di bawah ini.</p>
-                    <a href="{{ route('admin.verifikasi.cetak') }}" class="bg-red-600 text-white px-4 py-2 rounded shadow hover:bg-red-700 font-bold text-sm">
-                        DOWNLOAD LAPORAN (PDF)
-                    </a>
                 </div>
 
                 @if(session('success'))
@@ -27,7 +24,7 @@
                     <thead>
                         <tr class="bg-gray-100 text-left">
                             <th class="p-3 border">Nama Usaha</th>
-                            <th class="p-3 border">Status</th>
+                            <th class="p-3 border text-center">Status</th>
                             <th class="p-3 border text-center">Aksi</th>
                         </tr>
                     </thead>
@@ -41,16 +38,21 @@
                                 </span>
                             </td>
                             <td class="p-3 border text-center">
-                                <form action="{{ route('admin.verifikasi.update', $umkm->id) }}" method="POST" class="inline">
-                                    @csrf
-                                    <input type="hidden" name="status" value="aktif">
-                                    <button class="bg-green-600 text-white px-3 py-1 rounded text-sm mr-1 {{ $umkm->status == 'aktif' ? 'opacity-50' : '' }}" {{ $umkm->status == 'aktif' ? 'disabled' : '' }}>Terima</button>
-                                </form>
-                                <form action="{{ route('admin.verifikasi.update', $umkm->id) }}" method="POST" class="inline">
-                                    @csrf
-                                    <input type="hidden" name="status" value="ditolak">
-                                    <button class="bg-red-600 text-white px-3 py-1 rounded text-sm {{ $umkm->status == 'ditolak' ? 'opacity-50' : '' }}" {{ $umkm->status == 'ditolak' ? 'disabled' : '' }}>Tolak</button>
-                                </form>
+                                @if($umkm->status !== 'aktif')
+                                    {{-- Gunakan satu form saja dengan rute yang sesuai di web.php --}}
+                                    <form action="{{ route('admin.verifikasi.update', $umkm->id) }}" method="POST">
+                                        @csrf
+                                        @method('PATCH') {{-- Ini yang membuat PATCH didukung --}}
+                                        
+                                        <input type="hidden" name="status" value="aktif">
+                                        
+                                        <button type="submit" class="bg-green-600 hover:bg-green-700 text-white px-4 py-1 rounded text-sm font-medium transition">
+                                            <i class="bi bi-check-lg"></i> Terima / Verifikasi
+                                        </button>
+                                    </form>
+                                @else
+                                    <span class="text-gray-400 text-sm italic">Sudah Diverifikasi</span>
+                                @endif
                             </td>
                         </tr>
                         @endforeach
