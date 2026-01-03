@@ -13,7 +13,7 @@ class PenggunaSeeder extends Seeder
         DB::table('pengguna')->insert([
             [
                 'nik' => '1234567890123456',
-                'nama' => 'Admin Dinas',
+                'name' => 'Admin Dinas',
                 'email' => 'admin@example.com',
                 'password' => Hash::make('password123'),
                 'role' => 'admin',
@@ -23,7 +23,7 @@ class PenggunaSeeder extends Seeder
             ],
             [
                 'nik' => '2345678901234567',
-                'nama' => 'UMKM Maju',
+                'name' => 'UMKM Maju',
                 'email' => 'umkm1@example.com',
                 'password' => Hash::make('password123'),
                 'role' => 'umkm',
@@ -33,7 +33,7 @@ class PenggunaSeeder extends Seeder
             ],
             [
                 'nik' => '3456789012345678',
-                'nama' => 'Mitra Cerdas',
+                'name' => 'Mitra Cerdas',
                 'email' => 'mitra@example.com',
                 'password' => Hash::make('password123'),
                 'role' => 'mitra',
@@ -43,7 +43,7 @@ class PenggunaSeeder extends Seeder
             ],
             [
                 'nik' => '4567890123456789',
-                'nama' => 'UMKM Kreatif',
+                'name' => 'UMKM Kreatif',
                 'email' => 'umkm2@example.com',
                 'password' => Hash::make('password123'),
                 'role' => 'umkm',

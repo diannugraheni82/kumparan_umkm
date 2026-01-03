@@ -1,65 +1,55 @@
 <?php
 
-use App\Http\Controllers\ProfileController;
-use App\Http\Controllers\UmkmController;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\Admin\VerifikasiUmkmController;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Http\Request;
 
+// --- REDIRECT UTAMA ---
 Route::get('/', function () {
-    return view('welcome');
+    return Auth::check() ? redirect()->route('dashboard') : redirect()->route('login');
 });
 
-Route::get('/dashboard', function () {
-    $role = auth()->user()->role;
+// --- AUTHENTICATION ---
+Route::get('/login', function () {
+    return view('auth.login');
+})->name('login');
 
-    if ($role === 'admin') {
-        return redirect()->route('admin.dashboard');
-    } elseif ($role === 'mitra') {
-        return redirect()->route('mitra.dashboard');
+Route::post('/login', function (Request $request) {
+    $credentials = $request->validate([
+        'email' => ['required', 'email'],
+        'password' => ['required'],
+    ]);
+
+    if (Auth::attempt($credentials)) {
+        $request->session()->regenerate();
+        return redirect()->intended('/admin/dashboard');
     }
 
-    return redirect()->route('umkm.dashboard');
-})->middleware(['auth'])->name('dashboard');
+    return back()->withErrors(['email' => 'Email atau password salah.']);
+});
 
-//Admin
-Route::middleware(['auth', 'role:admin'])->group(function () {
+// --- AREA ADMIN (Backend 2) ---
+Route::middleware(['auth'])->group(function () {
+    
+    // Dashboard
     Route::get('/admin/dashboard', function () {
-        return view('admin.dashboard'); // Pastikan Caca buat folder admin/dashboard.blade.php
-    })->name('admin.dashboard');
+        return view('admin.dashboard');
+    })->name('dashboard');
+
+    // Verifikasi UMKM
+    Route::get('/admin/verifikasi', [VerifikasiUmkmController::class, 'index'])->name('admin.verifikasi.index');    
+    Route::post('/admin/verifikasi/{id}', [VerifikasiUmkmController::class, 'updateStatus'])->name('admin.verifikasi.update');
+
+    // Cetak PDF
+    Route::get('/admin/verifikasi/cetak', [VerifikasiUmkmController::class, 'cetakPdf'])->name('admin.verifikasi.cetak');
+
+    // Logout & Nav Fix
+    Route::get('/profile', function() { return "Profile Page"; })->name('profile.edit');
+    Route::post('/logout', function (Request $request) {
+        Auth::logout();
+        $request->session()->invalidate();
+        $request->session()->regenerateToken();
+        return redirect('/login');
+    })->name('logout');
 });
-
-// UMKM
-Route::middleware(['auth', 'role:umkm'])->group(function () {
-    // Dashboard Utama UMKM
-    Route::get('/umkm/dashboard', [UmkmController::class, 'index'])->name('umkm.dashboard');
-
-    // Proses Input Data (Profil UMKM)
-    Route::get('/umkm/input-data', [UmkmController::class, 'create'])->name('umkm.input');
-    Route::post('/umkm/input-data', [UmkmController::class, 'store'])->name('umkm.store');
-    
-    // Proses Edit Data
-    Route::get('/umkm/edit-data', [UmkmController::class, 'edit'])->name('umkm.edit');
-    Route::patch('/umkm/edit-data', [UmkmController::class, 'update'])->name('umkm.update');
-    
-    // Fitur Paylater/Pinjaman
-    Route::post('/umkm/ajukan-pinjaman', [UmkmController::class, 'ajukanPinjaman'])->name('umkm.ajukan-pinjaman');
-    Route::get('/umkm/cetak-bukti/{id}', [UmkmController::class, 'cetakBukti'])->name('umkm.cetak-bukti');
-    Route::get('/umkm/bayar/{id_pinjaman}', [UmkmController::class, 'bayar'])->name('umkm.bayar');
-    // Catatan: Route umkm.create dan umkm.store yang duplikat di bawah sudah dihapus 
-    // karena sudah diwakili oleh umkm.input dan umkm.store di atas.
-});
-// Mitra
-Route::middleware(['auth', 'role:mitra'])->group(function () {
-    Route::get('/mitra/dashboard', function () {
-        return view('mitra.dashboard'); // Pastikan Caca buat folder mitra/dashboard.blade.php
-    })->name('mitra.dashboard');
-});
-
-Route::middleware('auth')->group(function () {
-    Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
-    Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
-    Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
-});
-
-
-
-require __DIR__.'/auth.php';

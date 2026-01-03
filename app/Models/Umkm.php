@@ -2,15 +2,17 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class Umkm extends Model
 {
-    protected $table = 'umkm';
-    protected $casts = [
-        'portfolio_produk' => 'array',
-    ];
+    use HasFactory;
 
+    // Nama tabel di database
+    protected $table = 'umkm';
+
+    // Kolom yang boleh diisi (Mass Assignment)
     protected $fillable = [
         'pengguna_id', 
         'nama_usaha', 
@@ -35,33 +37,8 @@ class Umkm extends Model
         'portfolio_produk',
     ];
 
-    public function pengguna()
-    {
-        return $this->belongsTo(Pengguna::class, 'pengguna_id');
-    }
-
-    public function kategori()
-    {
-        return $this->belongsTo(KategoriUmkm::class, 'kategori_id');
-    }
-
-    public function lokasi()
-    {
-        return $this->belongsTo(Lokasi::class, 'lokasi_id');
-    }
-
-    public function legalitas()
-    {
-        return $this->hasOne(LegalitasUmkm::class, 'umkm_id');
-    }
-
-    public function PembiayaanModal()
-    {
-        return $this->hasMany(PembiayaanModal::class, 'umkm_id');
-    }
-
-    public function pendaftaranEvent()
-    {
-        return $this->hasMany(PendaftaranEvent::class, 'umkm_id');
-    }
+    // Mengubah data JSON/Array otomatis
+    protected $casts = [
+        'portfolio_produk' => 'array',
+    ];
 }

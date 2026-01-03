@@ -11,16 +11,16 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('umkm', function (Blueprint $table) {
+        //Schema::table('umkm', function (Blueprint $table) {
             // Menambahkan kolom portfolio (json) setelah kolom nama_usaha
-            $table->json('portfolio_produk')->nullable()->after('nama_usaha');
-        });
+            //$table->json('portfolio_produk')->nullable()->after('nama_usaha');
+        //});
     }
 
     public function down(): void
     {
-        Schema::table('umkm', function (Blueprint $table) {
-            $table->dropColumn('portfolio_produk');
-        });
+        //Schema::table('umkm', function (Blueprint $table) {
+            //$table->dropColumn('portfolio_produk');
+        //});
     }
 };
