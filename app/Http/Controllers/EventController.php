@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\Models\Event; // Import model agar kode lebih bersih
+use App\Models\Event; 
 use Illuminate\Support\Facades\Auth;
 
 class EventController extends Controller
@@ -13,7 +13,7 @@ class EventController extends Controller
         $user = Auth::user();
         $events = Event::where('mitra_id', $user->id)
                     ->withCount('umkms') 
-                    ->latest() // Menampilkan event terbaru di atas
+                    ->latest() 
                     ->get();
 
         return view('mitra.events.index', compact('events'));
@@ -26,27 +26,26 @@ class EventController extends Controller
 
     public function store(Request $request)
     {
-        // 1. Validasi input
+        if (!auth()->check()) {
+            return redirect()->route('login');
+        }
+
         $validated = $request->validate([
-            'nama_event' => 'required|string|max:255',
-            'tanggal'    => 'required|date|after_or_equal:today', // Minimal tanggal hari ini
-            'kuota'      => 'required|integer|min:1',
-            'lokasi'     => 'required|string|max:255', 
+            'nama_event' => 'required',
+            'tanggal'    => 'required',
+            'kuota'      => 'required|integer',
+            'lokasi'     => 'required',
         ]);
 
-        // 2. Simpan ke Database
-        Event::create([
-            'mitra_id'   => Auth::id(),
+        \App\Models\Event::create([
             'nama_event' => $validated['nama_event'],
             'tanggal'    => $validated['tanggal'],
             'kuota'      => $validated['kuota'],
-            // Karena nama kolom di database Anda 'lokasi_id' tapi berisi string,
-            // kita masukkan data dari input 'lokasi'
-            'lokasi_id'  => $validated['lokasi'], 
+            'lokasi'     => $validated['lokasi'],
+            'mitra_id'   => auth()->id(), 
         ]);
 
-        // 3. Redirect dengan pesan sukses
-        return redirect()->route('mitra.events.index') // Sebaiknya kembali ke list event
+        return redirect()->route('mitra.events.index') 
                         ->with('success', 'Event berhasil dipublikasikan!');
     }
 }

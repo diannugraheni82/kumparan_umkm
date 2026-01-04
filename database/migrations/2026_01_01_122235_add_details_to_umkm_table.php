@@ -12,15 +12,12 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('umkm', function (Blueprint $table) {
-            // Tambahkan kolom-kolom baru di sini jika belum ada di tabel utama
-            // Contoh:
             if (!Schema::hasColumn('umkm', 'no_whatsapp')) {
                 $table->string('no_whatsapp')->nullable();
             }
             if (!Schema::hasColumn('umkm', 'npwp')) {
                 $table->string('npwp')->nullable();
             }
-            // Tambahkan kolom lainnya sesuai kebutuhan aplikasi KUMPARAN DIGITAL
         });
     }
 

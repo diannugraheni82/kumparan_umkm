@@ -7,6 +7,9 @@ use Illuminate\Database\Eloquent\Model;
 class Notifikasi extends Model
 {
     protected $table = 'notifikasi';
+    protected $casts = [
+    'created_at' => 'datetime',
+];
 
     protected $fillable = [
         'pengguna_id', 

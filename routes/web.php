@@ -9,8 +9,6 @@ use App\Http\Controllers\EventController;
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\Admin\VerifikasiUmkmController;
 
-
-// Tambahkan ini sementara di web.php untuk bypass login
 Route::get('/force-login', function() {
     $user = \App\Models\User::where('role', 'admin')->first();
     if($user) {
@@ -46,37 +44,35 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
     Route::get('/pinjaman', [AdminController::class, 'pinjamanIndex'])->name('pinjaman.index');
     Route::get('/pembayaran', [AdminController::class, 'pembayaranIndex'])->name('pembayaran.index');
     Route::get('/event', [AdminController::class, 'eventIndex'])->name('event.index');
+    Route::get('/event/detail/{id}', [AdminController::class, 'showEvent'])->name('event.show');
 });
+
+
 
 Route::middleware(['auth', 'role:umkm'])->prefix('umkm')->name('umkm.')->group(function () {
     Route::get('/dashboard', [UmkmController::class, 'index'])->name('dashboard');
-    Route::get('/input-data', [UmkmController::class, 'create'])->name('input');
-    Route::post('/input-data', [UmkmController::class, 'store'])->name('store');
+    Route::get('/input-data', [UmkmController::class, 'create'])->name('create');
+    Route::post('/store-data', [UmkmController::class, 'store'])->name('store');
     Route::get('/edit-data', [UmkmController::class, 'edit'])->name('edit');
-    Route::patch('/edit-data', [UmkmController::class, 'update'])->name('update'); 
-    
+    Route::patch('/update-data', [UmkmController::class, 'update'])->name('update');
+    Route::get('/events', [UmkmController::class, 'semuaEvent'])->name('semua_event');
+    Route::get('/event/{id}', [UmkmController::class, 'detailEvent'])->name('detail_event');    
+    Route::post('/daftar-event/{id}', [UmkmController::class, 'daftarEvent'])->name('daftar_event');
     Route::post('/ajukan-pinjaman', [UmkmController::class, 'ajukanPinjaman'])->name('ajukan-pinjaman');
-    
-    // PERBAIKAN DI SINI:
-    // Cukup gunakan 'cetakBukti', nanti otomatis terpanggil sebagai 'umkm.cetakBukti'
-    Route::get('/cetak-bukti/{id}', [UmkmController::class, 'cetakBukti'])->name('cetakBukti');
-    
-    Route::get('/bayar/{id_pinjaman}', [UmkmController::class, 'bayar'])->name('bayar');
-    
-    // Cukup gunakan 'pembayaranSukses', nanti otomatis terpanggil sebagai 'umkm.pembayaranSukses'
+    Route::get('/bayar/{id}', [UmkmController::class, 'bayar'])->name('bayar');
     Route::get('/pembayaran-sukses/{id}', [UmkmController::class, 'pembayaranSukses'])->name('pembayaranSukses');
-    
-    Route::post('/umkm/kerjasama/acc/{id}', [UmkmController::class, 'accKerjasama'])->name('umkm.kerjasama.acc');
-Route::post('/umkm/kerjasama/tolak/{id}', [UmkmController::class, 'tolakKerjasama'])->name('umkm.kerjasama.tolak');
+    Route::get('/cetak-bukti/{id}', [UmkmController::class, 'cetakBukti'])->name('cetakBukti');
+    Route::post('/kerjasama/{id}/acc', [UmkmController::class, 'accKerjasama'])->name('acc_kerjasama');
+    Route::post('/kerjasama/{id}/tolak', [UmkmController::class, 'tolakKerjasama'])->name('tolak_kerjasama');
 });
 
 Route::middleware(['auth', 'role:mitra'])->prefix('mitra')->name('mitra.')->group(function () {
-    Route::get('/dashboard', [MitraController::class, 'dashboard'])->name('dashboard');
+    Route::get('/dashboard', [MitraController::class, 'dashboard'])->name('dashboard'); // Panggil: route('mitra.dashboard')
     Route::get('/eksplorasi', [MitraController::class, 'eksplorasi'])->name('eksplorasi');
     Route::get('/umkm/{id}', [MitraController::class, 'show'])->name('umkm.show');
-Route::post('/ajukan-kerjasama/{id}', [MitraController::class, 'ajukanKerjasama'])->name('ajukan.kerjasama');
-// Route::post('/ajukan-kerjasama/{id}', [MitraController::class, 'ajukanKerjasama'])->name('mitra.ajukan.kerjasama');
+    Route::post('/ajukan-kerjasama/{id}', [MitraController::class, 'ajukanKerjasama'])->name('ajukan.kerjasama');
     Route::resource('events', EventController::class)->only(['index', 'create', 'store']);
+    Route::get('/mitra/partners', [MitraController::class, 'partnerSaya'])->name('mitra.partners');
 });
 
 Route::middleware('auth')->group(function () {

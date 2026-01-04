@@ -52,7 +52,6 @@
     </style>
 </head>
 <body>
-
     <div class="container py-5">
         <div class="row justify-content-center">
             <div class="col-lg-8">
@@ -63,64 +62,66 @@
                         <h2 class="fw-bold mb-0">{{ $umkm->nama_usaha }}</h2>
                         <span class="badge bg-white text-primary mt-2">Profil Terverifikasi</span>
                     </div>
-<div class="card-body p-4 p-md-5">
-    <div class="row">
-        <div class="col-12 mb-4">
-            <span class="info-label"><i class="bi bi-info-circle me-2"></i>Deskripsi Usaha</span>
-            <div class="info-content">
-                {{ $umkm->deskripsi }}
-            </div>
-        </div>
 
-        <div class="col-12 mb-4">
-            <span class="info-label"><i class="bi bi-geo-alt me-2"></i>Alamat Lengkap</span>
-            <div class="info-content">
-                {{ $umkm->alamat_usaha }}
-            </div>
-        </div>
-
-        <div class="col-12 mb-4">
-            <span class="info-label"><i class="bi bi-images me-2"></i>Portfolio Produk</span>
-            <div class="row g-3 mt-1">
-                @if($umkm->portfolio_produk && count($umkm->portfolio_produk) > 0)
-                    @foreach($umkm->portfolio_produk as $produk)
-                        <div class="col-md-4 col-6">
-                            <div class="card h-100 border-0 shadow-sm rounded-4 overflow-hidden">
-                                @if(isset($produk['foto']))
-                                    <img src="{{ asset('storage/' . $produk['foto']) }}" 
-                                         class="card-img-top" 
-                                         alt="{{ $produk['nama'] }}"
-                                         style="height: 150px; object-fit: cover;">
-                                @else
-                                    <div class="bg-light d-flex align-items-center justify-content-center" style="height: 150px;">
-                                        <i class="bi bi-image text-muted fs-1"></i>
-                                    </div>
-                                @endif
-                                <div class="card-body p-2 text-center">
-                                    <h6 class="fw-bold mb-1 small">{{ $produk['nama'] }}</h6>
-                                    <p class="text-muted mb-0" style="font-size: 0.7rem;">{{ \Illuminate\Support\Str::limit($produk['detail'], 40) }}</p>
+                    <div class="card-body p-4 p-md-5">
+                        <div class="row">
+                            <div class="col-12 mb-4">
+                                <span class="info-label"><i class="bi bi-info-circle me-2"></i>Deskripsi Usaha</span>
+                                <div class="info-content">
+                                    {{ $umkm->deskripsi }}
                                 </div>
                             </div>
-                        </div>
-                    @endforeach
-                @else
-                    <div class="col-12">
-                        <div class="alert alert-light border-dashed text-center">
-                            <i class="bi bi-box2 text-muted me-2"></i> Belum ada foto produk yang diunggah.
-                        </div>
+
+                            <div class="col-12 mb-4">
+                                <span class="info-label"><i class="bi bi-geo-alt me-2"></i>Alamat Lengkap</span>
+                                <div class="info-content">
+                                    {{ $umkm->alamat_usaha }}
+                                </div>
+                            </div>
+
+                            <div class="col-12 mb-4">
+                                <span class="info-label"><i class="bi bi-images me-2"></i>Portfolio Produk</span>
+                                <div class="row g-3 mt-1">
+                                    @if($umkm->portfolio_produk && count($umkm->portfolio_produk) > 0)
+                                        @foreach($umkm->portfolio_produk as $produk)
+                                            <div class="col-md-4 col-6">
+                                                <div class="card h-100 border-0 shadow-sm rounded-4 overflow-hidden">
+                                                    @if(isset($produk['foto']))
+                                                        <img src="{{ asset('storage/' . $produk['foto']) }}" 
+                                                            class="card-img-top" 
+                                                            alt="{{ $produk['nama'] }}"
+                                                            style="height: 150px; object-fit: cover;">
+                                                    @else
+                                                        <div class="bg-light d-flex align-items-center justify-content-center" style="height: 150px;">
+                                                            <i class="bi bi-image text-muted fs-1"></i>
+                                                        </div>
+                                                    @endif
+                                                    <div class="card-body p-2 text-center">
+                                                        <h6 class="fw-bold mb-1 small">{{ $produk['nama'] }}</h6>
+                                                        <p class="text-muted mb-0" style="font-size: 0.7rem;">{{ \Illuminate\Support\Str::limit($produk['detail'], 40) }}</p>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        @endforeach
+                                    @else
+                                        <div class="col-12">
+                                            <div class="alert alert-light border-dashed text-center">
+                                                <i class="bi bi-box2 text-muted me-2"></i> Belum ada foto produk yang diunggah.
+                                            </div>
+                                        </div>
+                                    @endif
+                                </div>
+                            </div>
+                        </div> 
+                    <div class="d-grid gap-2 d-md-flex justify-content-md-between align-items-center mt-4">
+                        <a href="{{ route('mitra.dashboard') }}" class="btn btn-secondary btn-back shadow-sm">
+                            <i class="bi bi-arrow-left me-2"></i>Kembali
+                        </a>
+                        <button onclick="ajukanKerjasama()" class="btn btn-primary btn-back shadow-sm">
+                            <i class="bi bi-chat-dots me-2"></i>Ajukan Kerjasama
+                        </button>
                     </div>
-                @endif
-            </div>
-        </div>
-    </div> <div class="d-grid gap-2 d-md-flex justify-content-md-between align-items-center mt-4">
-        <a href="{{ route('mitra.dashboard') }}" class="btn btn-secondary btn-back shadow-sm">
-            <i class="bi bi-arrow-left me-2"></i>Kembali
-        </a>
-        <button onclick="ajukanKerjasama()" class="btn btn-primary btn-back shadow-sm">
-    <i class="bi bi-chat-dots me-2"></i>Ajukan Kerjasama
-</button>
-    </div>
-</div>
+                </div>
 
                 <p class="text-center text-muted mt-4 small">
                     &copy; 2026 KUMPARAN. - Sistem Pemberdayaan UMKM Digital
@@ -131,58 +132,68 @@
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
-function ajukanKerjasama() {
-    Swal.fire({
-        title: 'Ajukan Kerjasama?',
-        text: "Sistem akan mengirim notifikasi ke UMKM dan membuka WhatsApp",
-        icon: 'question',
-        showCancelButton: true,
-        confirmButtonColor: '#0d6efd',
-        cancelButtonColor: '#6c757d',
-        confirmButtonText: 'Ya, Hubungi!',
-        cancelButtonText: 'Batal'
-    }).then((result) => {
-        if (result.isConfirmed) {
-            // 1. Jalankan fungsi kirim notifikasi ke server via AJAX
-            function ajukanKerjasama() {
-    // Tampilkan loading sebentar agar user tahu proses sedang berjalan
-    Swal.fire({
-        title: 'Menghubungkan...',
-        text: 'Mohon tunggu sebentar',
-        allowOutsideClick: false,
-        didOpen: () => {
-            Swal.showLoading();
-        }
-    });
+    function ajukanKerjasama() {
+        Swal.fire({
+            title: 'Ajukan Kerjasama?',
+            text: "Sistem akan mengirim notifikasi ke UMKM dan membuka WhatsApp",
+            icon: 'question',
+            showCancelButton: true,
+            confirmButtonColor: '#0d6efd',
+            cancelButtonColor: '#6c757d',
+            confirmButtonText: 'Ya, Hubungi!',
+            cancelButtonText: 'Batal'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                prosesKirimAJAX();
+            }
+        });
+    }
 
-    fetch("{{ route('mitra.ajukan.kerjasama', $umkm->id) }}", { 
-        method: "POST",
-        headers: {
-            "X-CSRF-TOKEN": "{{ csrf_token() }}",
-            "Content-Type": "application/json",
-            "Accept": "application/json"
-        }
-    })
-    .then(response => response.json())
-    .then(data => {
-        if (data.success) {
-            Swal.close(); // Tutup loading
+    function prosesKirimAJAX() {
+        Swal.fire({
+            title: 'Menghubungkan...',
+            text: 'Mohon tunggu sebentar',
+            allowOutsideClick: false,
+            didOpen: () => {
+                Swal.showLoading();
+            }
+        });
+
+        fetch("{{ route('mitra.ajukan.kerjasama', $umkm->id) }}", { 
+            method: "POST",
+            headers: {
+                "X-CSRF-TOKEN": "{{ csrf_token() }}",
+                "Content-Type": "application/json",
+                "Accept": "application/json"
+            }
+        })
+        .then(response => {
+            if (!response.ok) throw new Error('Network response was not ok');
+            return response.json();
+        })
+        .then(data => {
+            Swal.close(); 
             
-            // Format pesan WhatsApp
-            const pesan = `Halo ${data.nama_umkm}, saya dari Mitra ${data.nama_mitra} tertarik untuk mengajukan kerjasama dengan usaha Anda.`;
-            const linkWa = `https://wa.me/${data.no_wa}?text=${encodeURIComponent(pesan)}`;
-            
-            // Langsung buka WhatsApp
-            window.open(linkWa, '_blank');
-        } else {
-            Swal.fire('Gagal', 'Tidak dapat memproses permintaan', 'error');
-        }
-    })
-    .catch(error => {
-        console.error('Error:', error);
-        Swal.fire('Error', 'Terjadi kesalahan koneksi', 'error');
-    });
-}
-</script>
+            if (data.success) {
+                const pesan = `Halo ${data.nama_umkm}, saya dari Mitra ${data.nama_mitra} tertarik untuk mengajukan kerjasama dengan usaha Anda.`;
+                
+                let phone = data.no_wa.replace(/[^0-9]/g, '');
+                if (phone.startsWith('0')) {
+                    phone = '62' + phone.substring(1);
+                }
+                
+                const linkWa = `https://api.whatsapp.com/send?phone=${phone}&text=${encodeURIComponent(pesan)}`;
+                
+                window.open(linkWa, '_blank');
+            } else {
+                Swal.fire('Gagal', data.message || 'Tidak dapat memproses permintaan', 'error');
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            Swal.fire('Error', 'Terjadi kesalahan koneksi atau server', 'error');
+        });
+    }
+    </script>
 </body>
 </html>

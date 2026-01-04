@@ -9,31 +9,44 @@ class Event extends Model
 {
     use HasFactory;
 
-    // Tambahkan nama tabel secara eksplisit jika nama tabel Anda 'event' (bukan 'events')
     protected $table = 'event';
 
-    // Daftarkan kolom yang boleh diisi melalui form
     protected $fillable = [
     'nama_event',
     'tanggal',
     'kuota',
-    'lokasi', // Pastikan ini ada
+    'lokasi', 
     'mitra_id',
     ];
 
-    // Relasi ke User/Mitra
     public function mitra()
     {
         return $this->belongsTo(User::class, 'mitra_id');
     }
 
     public function umkms()
-{
-    // Sesuaikan dengan nama tabel pivot Anda (pendaftaran_event)
-    return $this->belongsToMany(Umkm::class, 'pendaftaran_event', 'event_id', 'umkm_id');
-}
+    {
+        return $this->belongsToMany(User::class, 'pendaftaran_event', 'event_id', 'umkm_id')
+                    ->withPivot('created_at') 
+                    ->withTimestamps();
+    }
 
-public function user()
-{
-    return $this->belongsTo(User::class, 'user_id');
-}}
+    public function user()
+    {
+        return $this->belongsTo(User::class, 'user_id');
+    }
+
+    public function getSisaKuotaAttribute() {
+        return $this->kuota - $this->jumlah_pendaftar;
+    }
+
+    public function getTersediaAttribute() {
+        return $this->sisa_kuota > 0;
+    }
+
+    public function pendaftars()
+    {
+        return $this->hasMany(PendaftaranEvent::class, 'event_id');
+    }
+
+}

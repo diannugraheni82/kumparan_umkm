@@ -10,21 +10,19 @@ class DatabaseSeeder extends Seeder
 {
     use WithoutModelEvents;
 
-    public function run(): void
-    {
-        $this->call([
-            PenggunaSeeder::class,
-            KategoriUmkmSeeder::class,
-            LokasiSeeder::class,
-            UmkmSeeder::class,
-            LegalitasUmkmSeeder::class,
-            PembayaranPendaftaranSeeder::class,
-            // PembiayaanModalSeeder::class,  // Dimatikan sementara jika kolom 'status' belum ada
-            // CicilanPembiayaanSeeder::class, // Dimatikan karena bergantung pada PembiayaanModal
-            EventSeeder::class,
-            PendaftaranEventSeeder::class,
-            NotifikasiSeeder::class,
-            BeritaSeeder::class,
-        ]);
-    }
+   public function run(): void
+{
+    $this->call([
+        KategoriUmkmSeeder::class,
+        LokasiSeeder::class,
+        PenggunaSeeder::class, 
+        UmkmSeeder::class,
+        LegalitasUmkmSeeder::class,
+        PembayaranPendaftaranSeeder::class,
+        EventSeeder::class,             
+        PendaftaranEventSeeder::class,  
+        NotifikasiSeeder::class,
+        BeritaSeeder::class,
+    ]);
+}
 }

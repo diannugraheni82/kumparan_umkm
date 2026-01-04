@@ -4,7 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin Dashboard - KUMPARAN</title>
-    
+        
+    <link rel="icon" type="image/png" href="{{ asset('images/logo.png') }}">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -59,7 +60,6 @@
         .notif-scroll { max-height: 350px; overflow-y: auto; }
         .border-bottom-dashed { border-bottom: 1px dashed var(--soft-blue); }
         
-        /* Modern Table Styling */
         .table thead th {
             background-color: var(--light-blue);
             color: var(--primary-blue);
@@ -295,14 +295,16 @@
                                 <i class="bi bi-calendar-event fs-5"></i>
                             </div>
                             <div class="flex-grow-1 overflow-hidden">
-                                <div class="small fw-bold text-dark text-truncate">{{ $event->judul }}</div>
+                                <a href="{{ route('admin.event.show', $event->id) }}" class="text-decoration-none">
+                                    <div class="small fw-bold text-primary text-truncate">{{ $event->nama_event }}</div>
+                                </a>                                
                                 <div class="text-muted" style="font-size: 0.65rem;">
-                                    {{ \Carbon\Carbon::parse($event->tanggal_event)->format('d M Y') }}
+                                    {{ \Carbon\Carbon::parse($event->tanggal)->format('d M Y') }}
                                 </div>
                             </div>
                         </div>
                         @empty
-                            <p class="text-center py-5 text-muted small">Belum ada event</p>
+                            <p class="text-center py-5 text-muted small">Belum ada event tersimpan</p>
                         @endforelse
                     </div>
                 </div>

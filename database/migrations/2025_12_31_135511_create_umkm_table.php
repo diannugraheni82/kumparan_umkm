@@ -19,21 +19,16 @@ return new class extends Migration
             $table->string('npwp')->nullable();
             $table->text('alamat_usaha')->nullable();
             $table->string('status_tempat')->nullable();
-            $table->decimal('luas_lahan', 12, 2)->nullable(); // Diperluas ukurannya
-            $table->string('kbli', 10)->nullable(); // Diperluas dari 5 ke 10 untuk jaga-jaga
+            $table->decimal('luas_lahan', 12, 2)->nullable(); 
+            $table->string('kbli', 10)->nullable(); 
             $table->integer('jumlah_karyawan')->default(0);
             $table->bigInteger('modal_usaha')->default(0);
-            
-            // Kolom Kategori: Pastikan di Controller inputnya lowercase 'mikro'
             $table->enum('kategori', ['mikro', 'kecil', 'menengah'])->default('mikro');
-            
             $table->bigInteger('omzet_tahunan')->default(0);
-            $table->string('kapasitas_produksi')->nullable(); // Tetap string agar bisa "100kg"
+            $table->string('kapasitas_produksi')->nullable(); 
             $table->enum('sistem_penjualan', ['luring', 'daring', 'keduanya'])->default('luring');
-            
             $table->bigInteger('limit_pinjaman')->default(0);
             $table->bigInteger('saldo_pinjaman')->default(0);
-            
             $table->string('nama_bank')->nullable();
             $table->string('nomor_rekening')->nullable();
             $table->text('deskripsi');
@@ -58,7 +53,7 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('pinjaman_modal'); // Hapus anak dulu
-        Schema::dropIfExists('umkm'); // Baru hapus induk
+        Schema::dropIfExists('pinjaman_modal'); 
+        Schema::dropIfExists('umkm'); 
     }
 };

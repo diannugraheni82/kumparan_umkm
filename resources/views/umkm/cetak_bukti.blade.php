@@ -8,19 +8,69 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
     
     <style>
-        /* Tetap mempertahankan style asli kamu dengan sedikit tweak */
-        body { font-family: 'Courier New', Courier, monospace; background-color: #f4f7f6; }
-        .container-struk { max-width: 500px; margin: 30px auto; background: #fff; padding: 30px; border: 1px solid #ddd; box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
-        .header { text-align: center; border-bottom: 2px dashed #444; padding-bottom: 20px; margin-bottom: 20px; }
-        .status { color: #059669; font-weight: bold; text-transform: uppercase; border: 2px solid #059669; display: inline-block; padding: 5px 15px; margin-top: 10px; border-radius: 5px; }
-        .label { color: #666; width: 150px; }
-        .total { font-size: 1.2em; font-weight: bold; background-color: #f8fafc; }
-        .footer { margin-top: 30px; font-size: 0.8em; color: #999; text-align: center; border-top: 1px solid #eee; pt-3; }
+        body { 
+            font-family: 'Courier New', Courier, monospace; 
+            background-color: #f4f7f6; 
+        }
+
+        .container-struk { 
+            max-width: 500px; 
+            margin: 30px auto; 
+            background: #fff; 
+            padding: 30px; 
+            border: 1px solid #ddd; 
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05); 
+        }
+
+        .header { 
+            text-align: center; 
+            border-bottom: 2px dashed #444; 
+            padding-bottom: 20px; 
+            margin-bottom: 20px; 
+        }
+
+        .status { 
+            color: #059669; 
+            font-weight: bold; 
+            text-transform: uppercase; 
+            border: 2px solid #059669; 
+            display: inline-block; 
+            padding: 5px 15px; 
+            margin-top: 10px; 
+            border-radius: 5px; 
+        }
         
-        /* Hilangkan tombol saat dicetak */
+        .label { 
+            color: #666; 
+            width: 150px; 
+        }
+        
+        .total { 
+            font-size: 1.2em; 
+            font-weight: bold; 
+            background-color: #f8fafc; 
+        }
+        
+        .footer { 
+            margin-top: 30px; 
+            font-size: 0.8em; 
+            color: #999; 
+            text-align: center; 
+            border-top: 1px solid #eee; 
+            pt-3; 
+        }
+
         @media print {
-            .no-print { display: none; }
-            .container-struk { border: none; box-shadow: none; margin: 0; max-width: 100%; }
+            .no-print { 
+                display: none; 
+            }
+            
+            .container-struk { 
+                border: none; 
+                box-shadow: none; 
+                margin: 0; 
+                max-width: 100%; 
+            }
         }
     </style>
 </head>
@@ -81,8 +131,6 @@
 
     <script>
         window.onload = function() {
-            // Uncomment line di bawah jika ingin langsung muncul jendela print saat dibuka
-            // window.print();
         }
     </script>
 </body>

@@ -13,7 +13,7 @@ return new class extends Migration
             $user->foreignId('pembiayaan_modal_id')->constrained('pembiayaan_modal')->onDelete('cascade');
             $user->integer('jumlah_bayar');
             $user->date('tanggal_bayar');
-            $user->string('status')->default('pending'); // pending, success, failed
+            $user->string('status')->default('pending'); 
             $user->string('snap_token')->nullable();
             $user->timestamps();
         });

@@ -50,30 +50,22 @@ class User extends Authenticatable
             'password' => 'hashed',
         ];
     }
-    // app/Models/User.php
+    
 
-// app/Models/User.php
+    public function umkms()
+    {
+        return $this->belongsToMany(Umkm::class, 'pendaftaran_event', 'event_id', 'umkm_id')
+                    ->withPivot('status', 'created_at')
+                    ->withTimestamps();
+    }
 
-public function umkms()
-{
-    // 'pendaftaran_event' adalah nama tabel pivot Anda
-    // 'status_kolaborasi' adalah kolom untuk membedakan mana yang sudah ACC
-    return $this->belongsToMany(Umkm::class, 'pendaftaran_event', 'mitra_id', 'umkm_id')
-                ->withPivot('status_kolaborasi', 'created_at')
-                ->withTimestamps();
-}
+    public function events()
+    {
+        return $this->hasMany(Event::class, 'mitra_id');
+    }
 
-// app/Models/User.php
-
-public function events()
-{
-    // Mengacu ke tabel 'event' yang Anda buat tadi
-    return $this->hasMany(Event::class, 'mitra_id');
-}
-
-// app/Models/User.php
-public function umkm()
-{
-    return $this->hasOne(Umkm::class, 'pengguna_id');
-}
+    public function umkm()
+    {
+        return $this->hasOne(Umkm::class, 'pengguna_id');
+    }
 }

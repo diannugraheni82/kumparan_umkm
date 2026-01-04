@@ -7,13 +7,20 @@ use App\Models\PendaftaranEvent;
 
 class PendaftaranEventSeeder extends Seeder
 {
-    public function run()
-    {
-        PendaftaranEvent::insert([
-            ['event_id'=>1,'umkm_id'=>1],
-            ['event_id'=>1,'umkm_id'=>2],
-            ['event_id'=>2,'umkm_id'=>3],
-            ['event_id'=>3,'umkm_id'=>4],
+    public function run(): void
+{
+    $event = \DB::table('event')->first();
+    $umkm = \DB::table('pengguna')->where('role', 'umkm')->first();
+
+    if ($event && $umkm) {
+        \DB::table('pendaftaran_event')->insert([
+            [
+                'event_id'   => $event->id,
+                'umkm_id'    => $umkm->id,
+                'created_at' => now(),
+                'updated_at' => now(),
+            ],
         ]);
     }
+}
 }

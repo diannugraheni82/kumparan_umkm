@@ -7,36 +7,27 @@ use Illuminate\Support\Facades\DB;
 
 class EventSeeder extends Seeder
 {
-    public function run(): void
+    public function run()
     {
-        DB::table('event')->insert([
+        \DB::table('event')->insert([
             [
-                'mitra_id' => 3,
-                'lokasi_id' => 1,
                 'nama_event' => 'Pelatihan UMKM',
-                'tanggal' => now()->addDays(10),
-                'kuota' => 50,
+                'tanggal'    => '2026-01-14 15:26:41',
+                'kuota'      => 50,
+                'lokasi'     => 'Gedung Pusat Niaga', 
+                'mitra_id'   => 1, 
                 'created_at' => now(),
                 'updated_at' => now(),
             ],
             [
-                'mitra_id' => 3,
-                'lokasi_id' => 2,
                 'nama_event' => 'Workshop Digital Marketing',
-                'tanggal' => now()->addDays(15),
-                'kuota' => 30,
-                'created_at' => now(),
-                'updated_at' => now(),
-            ],
-            [
-                'mitra_id' => 3,
-                'lokasi_id' => 3,
-                'nama_event' => 'Seminar Kreatifitas',
-                'tanggal' => now()->addDays(20),
-                'kuota' => 40,
+                'tanggal'    => '2026-01-19 15:26:41',
+                'kuota'      => 30,
+                'lokasi'     => 'Online (Zoom Meeting)', 
+                'mitra_id'   => 1,
                 'created_at' => now(),
                 'updated_at' => now(),
             ],
         ]);
-    }
+    }    
 }

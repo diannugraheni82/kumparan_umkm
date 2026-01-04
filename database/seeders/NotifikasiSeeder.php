@@ -7,13 +7,24 @@ use App\Models\Notifikasi;
 
 class NotifikasiSeeder extends Seeder
 {
-    public function run()
-    {
-        Notifikasi::insert([
-            ['pengguna_id'=>2,'judul'=>'Selamat Datang','pesan'=>'UMKM Anda berhasil terdaftar','dibaca'=>false],
-            ['pengguna_id'=>4,'judul'=>'Update Event','pesan'=>'Event Workshop Kreatif telah dibuka','dibaca'=>false],
-            ['pengguna_id'=>3,'judul'=>'Info UMKM','pesan'=>'Cek performa UMKM yang diajukan pembiayaan','dibaca'=>false],
-            ['pengguna_id'=>2,'judul'=>'Pembayaran','pesan'=>'Pembayaran pendaftaran Anda diterima','dibaca'=>false],
+    public function run(): void
+{
+    $users = \DB::table('pengguna')->pluck('id')->toArray();
+
+    if (count($users) > 0) {
+        \DB::table('notifikasi')->insert([
+            [
+                'pengguna_id' => $users[0], 
+                'judul' => 'Selamat Datang',
+                'pesan' => 'UMKM Anda berhasil terdaftar',
+                'dibaca' => 0,
+            ],
+            [
+                'pengguna_id' => $users[array_rand($users)], 
+                'judul' => 'Update Event',
+                'pesan' => 'Event Workshop Kreatif telah dibuka',
+                'dibaca' => 0,
+            ],
         ]);
     }
-}
+}}

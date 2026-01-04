@@ -14,13 +14,11 @@ return new class extends Migration
         Schema::create('event', function (Blueprint $table) {
             $table->id();
             $table->string('nama_event');
-            $table->dateTime('tanggal');
+            $table->datetime('tanggal');
             $table->integer('kuota');
-            
-            // TAMBAHKAN BARIS INI:
-            $table->foreignId('lokasi_id')->constrained('lokasi')->onDelete('cascade');
+            $table->string('lokasi'); 
             $table->foreignId('mitra_id')->constrained('pengguna')->onDelete('cascade');
-            
+            $table->text('deskripsi');
             $table->timestamps();
         });        
     }

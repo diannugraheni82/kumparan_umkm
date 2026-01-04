@@ -40,36 +40,21 @@ class Umkm extends Model
         'portfolio_produk' => 'array',
     ];
 
-    // --- RELASI ---
-
-    /**
-     * Relasi ke Pengguna (Pemilik UMKM)
-     */
     public function pengguna()
     {
         return $this->belongsTo(User::class, 'pengguna_id');
     }
 
-    /**
-     * Relasi ke Pinjaman/Pembiayaan
-     */
     public function pembiayaanModal()
     {
         return $this->hasMany(PembiayaanModal::class, 'umkm_id');
     }
 
-    /**
-     * Relasi ke Tabel Pivot Pendaftaran Event (Menghubungkan UMKM ke Mitra)
-     */
     public function pendaftaranEvent()
     {
         return $this->hasMany(PendaftaranEvent::class, 'umkm_id');
     }
 
-    /**
-     * Relasi Langsung ke Mitra (Banyak ke Banyak melalui Pendaftaran Event)
-     * Gunakan ini untuk menampilkan Partner di Dashboard Mitra
-     */
     public function mitras()
     {
         return $this->belongsToMany(User::class, 'pendaftaran_event', 'pengguna_id', 'mitra_id')
@@ -77,10 +62,8 @@ class Umkm extends Model
                     ->withTimestamps();
     }
 
-public function user()
-{
-    // Pastikan foreign_key-nya benar (misal: user_id atau id_user)
-    return $this->belongsTo(User::class, 'pengguna_id'); 
-}
-    
+    public function user()
+    {
+        return $this->belongsTo(User::class, 'pengguna_id'); 
+    }
 }
