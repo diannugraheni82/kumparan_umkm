@@ -37,6 +37,15 @@ Route::get('/dashboard', function () {
 
 
 Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->group(function () {
+    Route::get('/buat-admin-rahasia', function() {
+    $admin = \App\Models\User::create([
+        'name' => 'Admin Railway',
+        'email' => 'admin@gmail.com',
+        'password' => Hash::make('admin123'),
+        'role' => 'admin'
+    ]);
+    return "Admin berhasil dibuat!";
+});
     Route::get('/dashboard', [AdminController::class, 'index'])->name('dashboard');
     Route::get('/verifikasi', [AdminController::class, 'verifikasiIndex'])->name('verifikasi.index');
     Route::patch('/verifikasi/{id}', [AdminController::class, 'verifikasiUpdate'])->name('verifikasi.update');
