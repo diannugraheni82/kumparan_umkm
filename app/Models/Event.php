@@ -20,8 +20,8 @@ class Event extends Model
     ];
 
     protected $attributes = [
-    'deskripsi' => '-',
-````];
+        'deskripsi' => '-',
+    ];
 
     public function mitra()
     {
