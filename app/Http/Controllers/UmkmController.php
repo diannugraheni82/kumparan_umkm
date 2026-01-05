@@ -121,7 +121,7 @@ class UmkmController extends Controller
             'kategori'       => $kategori,
             'limit_pinjaman' => $limit,
             'saldo_pinjaman' => 0,
-            'portfolio_produk' => $portfolio,
+            // 'portfolio_produk' => $portfolio,
             'status'         => 'pending'
         ]));
 
