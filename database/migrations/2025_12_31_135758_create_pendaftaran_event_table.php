@@ -14,8 +14,7 @@ return new class extends Migration
     Schema::create('pendaftaran_event', function (Blueprint $table) {
         $table->id();
         $table->foreignId('event_id')->constrained('event')->onDelete('cascade');
-        $table->foreignId('umkm_id')->constrained('pengguna')->onDelete('cascade');
-        $table->string('status')->default('menunggu'); 
+        $table->foreignId('umkm_id')->constrained('umkm')->onDelete('cascade');
         $table->timestamps();
     });
 

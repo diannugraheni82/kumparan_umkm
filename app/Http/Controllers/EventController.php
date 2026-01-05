@@ -24,25 +24,38 @@ class EventController extends Controller
         return view('mitra.events.create');
     }
 
-// Di dalam EventController.php fungsi store
-public function store(Request $request) 
-{
-    $validated = $request->validate([
-        'nama_event' => 'required',
-        'tanggal'    => 'required',
-        'kuota'      => 'required|integer',
-        'lokasi'     => 'required',
-        // Jangan tambahkan deskripsi required di sini jika di form blade sudah dihapus
-    ]);
+    public function store(Request $request) 
+    {
+        $validated = $request->validate([
+            'nama_event' => 'required',
+            'tanggal'    => 'required',
+            'kuota'      => 'required|integer',
+            'lokasi'     => 'required',
+        ]);
 
-    \App\Models\Event::create([
-        'nama_event' => $validated['nama_event'],
-        'tanggal'    => $validated['tanggal'],
-        'kuota'      => $validated['kuota'],
-        'lokasi'     => $validated['lokasi'],
-        'deskripsi'  => '-', // WAJIB ADA BARIS INI agar database tidak menolak
-        'mitra_id'   => auth()->id(), 
-    ]);
+        \App\Models\Event::create([
+            'nama_event' => $validated['nama_event'],
+            'tanggal'    => $validated['tanggal'],
+            'kuota'      => $validated['kuota'],
+            'lokasi'     => $validated['lokasi'],
+            'deskripsi'  => '-', 
+        ]);
 
-    return redirect()->route('mitra.events.index')->with('success', 'Event berhasil dibuat');
-}}
+        return redirect()->route('mitra.events.index')->with('success', 'Event berhasil dibuat');
+    }
+
+    public function daftarEvent(Request $request)
+    {
+        $umkm = \App\Models\Umkm::where('pengguna_id', auth()->id())->first();
+
+        if (!$umkm) {
+            return back()->with('error', 'Data UMKM tidak ditemukan.');
+        }
+
+        \App\Models\PendaftaranEvent::create([
+            'event_id' => $request->event_id,
+            'umkm_id'  => $umkm->id, 
+            'status'   => 'pending',
+        ]);
+    }
+}
