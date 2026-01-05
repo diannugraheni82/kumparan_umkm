@@ -42,7 +42,7 @@ class EventController extends Controller
             'tanggal'    => $validated['tanggal'],
             'kuota'      => $validated['kuota'],
             'lokasi'     => $validated['lokasi'],
-            'deskripsi'  => '-',
+            'deskripsi'  => '-', 
             'mitra_id'   => auth()->id(), 
         ]);
 
