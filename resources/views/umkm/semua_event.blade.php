@@ -238,9 +238,9 @@
                                 </button>
                             @elseif($event->tersedia)
                                 <form action="{{ route('umkm.daftar_event', $event->id) }}" method="POST">
-                                    @csrf
-                                    <button type="submit" class="btn btn-event btn-event-primary w-100 shadow">
-                                        <i class="bi bi-plus-circle me-1"></i> Daftar Sekarang
+                                    @csrf 
+                                    <button type="submit" class="btn btn-event-primary">
+                                        Daftar Sekarang
                                     </button>
                                 </form>
                             @else
