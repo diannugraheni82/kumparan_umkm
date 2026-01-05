@@ -19,6 +19,10 @@ class Event extends Model
     'mitra_id',
     ];
 
+    protected $attributes = [
+    'deskripsi' => '-',
+````];
+
     public function mitra()
     {
         return $this->belongsTo(User::class, 'mitra_id');
