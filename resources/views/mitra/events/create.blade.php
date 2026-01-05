@@ -109,7 +109,7 @@
                             <small class="text-muted" style="font-size: 0.75rem;">Masukkan alamat lengkap atau link pertemuan jika online.</small>
                         </div>
 
-                        <div class="mb-3">
+                        <!-- <div class="mb-3">
                             <label for="deskripsi" class="form-label fw-bold">Deskripsi Event</label>
                             <textarea 
                                 name="deskripsi" 
@@ -126,7 +126,7 @@
                             @enderror
                             <div class="form-text">Berikan informasi selengkap mungkin agar menarik minat UMKM.</div>
                         </div>
-
+ -->
                         <form action="{{ route('mitra.events.store') }}" method="POST">
                             @csrf <button type="submit">Kirim</button>
                         </form>
