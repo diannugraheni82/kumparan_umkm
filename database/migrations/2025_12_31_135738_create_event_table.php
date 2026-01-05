@@ -18,7 +18,7 @@ return new class extends Migration
             $table->integer('kuota');
             $table->string('lokasi'); 
             $table->foreignId('mitra_id')->constrained('pengguna')->onDelete('cascade');
-            $table->text('deskripsi');
+            // $table->text('deskripsi');
             $table->timestamps();
         });        
     }
