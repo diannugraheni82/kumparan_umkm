@@ -10,6 +10,7 @@ use Illuminate\Support\Facades\URL;
 
 class AppServiceProvider extends ServiceProvider
 {
+    public const HOME = '/dashboard';
     /**
      * Register any application services.
      */

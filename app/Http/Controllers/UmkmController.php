@@ -93,19 +93,20 @@ class UmkmController extends Controller
             'produk_foto.*'      => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
         ]);
 
-        // $portfolio = [];
-        // if ($request->has('produk_nama')) {
-        //     foreach ($request->produk_nama as $key => $namaProduk) {
-        //         $path = $request->hasFile("produk_foto.$key") 
-        //             ? $request->file("produk_foto.$key")->store('produk', 'public') 
-        //             : null;
-        //         $portfolio[] = [
-        //             'nama' => $namaProduk,
-        //             'detail' => $request->produk_detail[$key] ?? '',
-        //             'foto' => $path
-        //         ];
-        //     }
-        // }
+        $portfolio = [];
+        if ($request->has('produk_nama')) {
+            foreach ($request->produk_nama as $key => $namaProduk) {
+                $path = null;
+                if ($request->hasFile("produk_foto.$key")) {
+                    $path = $request->file("produk_foto.$key")->store('produk', 'public');
+                }
+                $portfolio[] = [
+                    'nama' => $namaProduk,
+                    'detail' => $request->produk_detail[$key] ?? '',
+                    'foto' => $path
+                ];
+            }
+        }
 
         $modal = $request->modal_usaha;
         if ($modal <= 50000000) {
@@ -117,13 +118,13 @@ class UmkmController extends Controller
         }
 
         Umkm::create(array_merge($validatedData, [
-            'pengguna_id'    => Auth::id(),
-            'kategori'       => $kategori,
-            'limit_pinjaman' => $limit,
-            'saldo_pinjaman' => 0,
-            // 'portfolio_produk' => $portfolio,
-            'status'         => 'pending'
-        ]));
+        'pengguna_id'    => Auth::id(),
+        'kategori'       => $kategori,
+        'limit_pinjaman' => $limit,
+        'saldo_pinjaman' => 0,
+        'portfolio_produk' => $portfolio,
+        'status'         => 'pending'
+    ]));
 
         return redirect()->route('umkm.dashboard')->with('success', "Pendaftaran berhasil!");
     }
@@ -197,12 +198,10 @@ class UmkmController extends Controller
         $user = Auth::user();
         $umkm = Umkm::where('pengguna_id', $user->id)->first();
 
-        // 1. Ambil data event dari database
         $events = Event::where('tanggal', '>=', now())
                     ->orderBy('tanggal', 'asc')
                     ->get();
 
-        // 2. Tambahkan logika pendukung (sisa kuota & status daftar)
         foreach ($events as $event) {
             $event->sisa_kuota = $event->kuota - $event->pendaftars()->count();
             $event->sudah_daftar = PendaftaranEvent::where('event_id', $event->id)
@@ -211,7 +210,6 @@ class UmkmController extends Controller
             $event->tersedia = ($event->sisa_kuota > 0);
         }
 
-        // 3. WAJIB: masukkan 'events' ke dalam compact
         return view('umkm.semua_event', compact('events', 'umkm'));
     }
 

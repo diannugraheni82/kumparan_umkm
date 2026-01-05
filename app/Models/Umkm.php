@@ -13,31 +13,15 @@ class Umkm extends Model
     protected $table = 'umkm';
 
     protected $fillable = [
-        'pengguna_id', 
-        'nama_usaha', 
-        'no_whatsapp', 
-        'npwp', 
-        'alamat_usaha', 
-        'status_tempat', 
-        'luas_lahan', 
-        'kbli', 
-        'jumlah_karyawan', 
-        'kategori', 
-        'modal_usaha', 
-        'omzet_tahunan',
-        'limit_pinjaman', 
-        'saldo_pinjaman',
-        'kapasitas_produksi', 
-        'sistem_penjualan', 
-        'deskripsi', 
-        'status',
-        'nama_bank',
-        'nomor_rekening',
-        'portfolio_produk',
+        'pengguna_id', 'nama_usaha', 'no_whatsapp', 'npwp', 'alamat_usaha', 
+        'status_tempat', 'luas_lahan', 'kbli', 'jumlah_karyawan', 'modal_usaha', 
+        'omzet_tahunan', 'kapasitas_produksi', 'sistem_penjualan', 'deskripsi', 
+        'nama_bank', 'nomor_rekening', 'kategori', 'limit_pinjaman', 
+        'saldo_pinjaman', 'portfolio_produk', 'status'
     ];
 
     protected $casts = [
-        'portfolio_produk' => 'array',
+        'portfolio_produk' => 'array', 
     ];
 
     public function pengguna()

@@ -19,7 +19,7 @@ Route::get('/force-login', function() {
 });
 
 Route::get('/', function () {
-    return Auth::check() ? redirect()->route('dashboard') : view('welcome');
+    return view('welcome');
 });
 
 Route::get('/dashboard', function () {
