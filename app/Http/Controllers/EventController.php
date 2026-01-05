@@ -24,29 +24,25 @@ class EventController extends Controller
         return view('mitra.events.create');
     }
 
-    public function store(Request $request)
-    {
-        if (!auth()->check()) {
-            return redirect()->route('login');
-        }
+// Di dalam EventController.php fungsi store
+public function store(Request $request) 
+{
+    $validated = $request->validate([
+        'nama_event' => 'required',
+        'tanggal'    => 'required',
+        'kuota'      => 'required|integer',
+        'lokasi'     => 'required',
+        // Jangan tambahkan deskripsi required di sini jika di form blade sudah dihapus
+    ]);
 
-        $validated = $request->validate([
-            'nama_event' => 'required',
-            'tanggal'    => 'required',
-            'kuota'      => 'required|integer',
-            'lokasi'     => 'required',
-        ]);
+    \App\Models\Event::create([
+        'nama_event' => $validated['nama_event'],
+        'tanggal'    => $validated['tanggal'],
+        'kuota'      => $validated['kuota'],
+        'lokasi'     => $validated['lokasi'],
+        'deskripsi'  => '-', // WAJIB ADA BARIS INI agar database tidak menolak
+        'mitra_id'   => auth()->id(), 
+    ]);
 
-        \App\Models\Event::create([
-            'nama_event' => $validated['nama_event'],
-            'tanggal'    => $validated['tanggal'],
-            'kuota'      => $validated['kuota'],
-            'lokasi'     => $validated['lokasi'],
-            'deskripsi'  => '-', 
-            'mitra_id'   => auth()->id(), 
-        ]);
-
-        return redirect()->route('mitra.events.index') 
-                        ->with('success', 'Event berhasil dipublikasikan!');
-    }
-}
+    return redirect()->route('mitra.events.index')->with('success', 'Event berhasil dibuat');
+}}
